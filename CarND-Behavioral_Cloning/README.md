@@ -88,15 +88,17 @@ and the nvidia paper [nvidia paper](http://images.nvidia.com/content/tegra/autom
 I used a model having three conv2D levels connected by max pooling and drop layer to reduce over fitting.
 Details as below:
 
- | Layer Number | Description |
- | ------------ | ----------- |
- | Layer 1-4 | Conv layer with 32 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) |
- | Layer 5-8 | Conv layer with 64 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) |
- | Layer 9-12 | Conv layer with 64 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) |
- | Layer 13-15 | Fully connected layer with 1024 neurons, Dropout(0.15) and RELU activation |
- | Layer 16-17 | Fully connected layer with 512 neurons and RELU activation |
- | Layer 18-19 | Fully connected layer with 64 neurons and RELU activation |
- | Layer 20 | Output layer is one neuron |
+
+<table>
+<thead><tr><th>Layer Number</th><th>Description</th></tr></thead>
+<tr><td>Layer 1-4</td><td>Conv layer with 32 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) </td></tr>
+<tr><td>Layer 5-8</td><td>Conv layer with 32 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) </td></tr>
+<tr><td>Layer 9-12</td><td>Conv layer with 32 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) </td></tr>
+<tr><td>Layer 13-15</td><td>Fully connected layer with 1024 neurons, Dropout(0.15) and RELU activation</td></tr>
+<tr><td>Layer 16-17</td><td>Fully connected layer with 512 neurons and RELU activation</td></tr>
+<tr><td>Layer 18-19</td><td>Fully connected layer with 64 neurons and RELU activation</td></tr>
+<tr><td>Layer 20</td><td>Output layer is one neuron</td></tr>
+</table>
 
 All layers are initiated with normalized weights.
 
@@ -114,8 +116,8 @@ Optimizer: nadam Optimizer. In tests that optimizer showed a more constant impro
 ## Demo Video
 Click on the image to watch the video.
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=Rsw2LaySeQ0
-" target="_blank"><img src="http://img.youtube.com/vi/Rsw2LaySeQ0/0.jpg" 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=2rWIzM8ak0E
+" target="_blank"><img src="http://img.youtube.com/vi/2rWIzM8ak0E/0.jpg" 
 alt="Demo Video" width="480" height="270" border="10" /></a>
 
 
