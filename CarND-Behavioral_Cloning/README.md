@@ -16,7 +16,7 @@ Despite of that I continued to work out my own solution and concentrated on the 
 I used the dataset provided by Udacity. The set contains images of three cameras, each camera got 8036 images. I did record data by myself, but the disapointing results during the first exhausive tests let me move to the Udacity dataset. I expected comparable results related to fellows projects solutions.
 
 The dataset contains JPG images of dimensions 160x320x3. Here are some sample images from the dataset.
-![](images/caperas.png)
+![](images/cameras.png)
 
 ## Data Augmentation
 
@@ -37,7 +37,7 @@ During further testing I notified, that many of my trained networks got only pro
 
 In total I used sample size of 38720 images for training and 9600 vor validation per each epoch.
 
-## Data Preprocessing.
+## Data Preprocessing
 
 In parallel I  to the Behavioral Cloning, I worked on the Advanced Line finding project and had therefore the motivation to use some preprocessing that extract features from the images.
 
@@ -65,7 +65,7 @@ Finally the image is resized to 64x64x3.
 
 The image shows the discribed different channels and the contour image.
 
-![](preprocessing.png)
+![](images/preprocessing.png)
 
 ## Data Generation
 The data is augmented and generated on the fly using a python generators. Because of randomizing the selection of the three camera, flip of the image and x/y shifts I increased the sample size of each epoch by the factor of 10. 
@@ -80,13 +80,15 @@ and the nvidia paper [nvidia paper](http://images.nvidia.com/content/tegra/autom
 I used a model having three conv2D levels connected by max pooling and drop layer to reduce over fitting.
 Details as below:
 
-|Layer 1-4 | Conv layer with 32 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) |
-|Layer 5-8 | Conv layer with 64 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) |
-|Layer 9-12 | Conv layer with 64 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) |
-|Layer 13-15 | Fully connected layer with 1024 neurons, Dropout(0.15) and RELU activation|
-|Layer 16-17 | Fully connected layer with 512 neurons and RELU activation|
-|Layer 18-19 |Fully connected layer with 64 neurons and RELU activation|
-|Layer 20 | Output layer is one neuron|
+ | Layer Number | Description |
+ | ------------ | ----------- |
+ | Layer 1-4 | Conv layer with 32 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) |
+ | Layer 5-8 | Conv layer with 64 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) |
+ | Layer 9-12 | Conv layer with 64 3x3 filters, RELU activation, 2x2 max pooling and dropout(0.15) |
+ | Layer 13-15 | Fully connected layer with 1024 neurons, Dropout(0.15) and RELU activation |
+ | Layer 16-17 | Fully connected layer with 512 neurons and RELU activation |
+ | Layer 18-19 | Fully connected layer with 64 neurons and RELU activation |
+ | Layer 20 | Output layer is one neuron |
 
 All layers are initiated with normalized weights.
 
@@ -102,18 +104,25 @@ All layers are initiated with normalized weights.
 
 ## Demo Video
 Click on the image to watch the video.
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
-" target="_blank"><img src="http://youtu.be/Rsw2LaySeQ0" 
-alt="demo video" width="320" height="240" border="10" /></a>
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=Rsw2LaySeQ0
+" target="_blank"><img src="http://img.youtube.com/vi/Rsw2LaySeQ0/0.jpg" 
+alt="Demo Video" width="480" height="270" border="10" /></a>
+
 
 ## Code
 
-| model.py | the script to create and train the model|
-| drive.py | the script to drive the car |
-| preprocess.py | teh script to do the preprocessing | call from drive nd model scripts|
-| README.MD | this file |
-| model.json | the model configuration|
-| model.h5 | the model weights|
+ | model.py | the script to create and train the model |
+ | drive.py | the script to drive the car |
+ | preprocess.py | the script to do the preprocessing | call from drive nd model scripts |
+ | README.MD | this file |
+ | model.json | the model configuration |
+ | model.h5 | the model weights |
 
+#System Environment
+
+Linux Ubuntu 14.04
+GPU NVIDIA 1060 Driver Version: 367.48
+Python 3.5 
 
 
