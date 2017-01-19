@@ -65,7 +65,15 @@ Finally the image is resized to 64x64x3.
 
 The image shows the discribed different channels and the contour image.
 
-![](images/preprocessing.png)
+![](images/preprocessing1.png)
+
+![](images/preprocessing2.png)
+
+![](images/preprocessing3.png)
+
+![](images/preprocessing4.png)
+
+![](images/preprocessing5.png)
 
 ## Data Generation
 The data is augmented and generated on the fly using a python generators. Because of randomizing the selection of the three camera, flip of the image and x/y shifts I increased the sample size of each epoch by the factor of 10. 
