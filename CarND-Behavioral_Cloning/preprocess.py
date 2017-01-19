@@ -77,6 +77,9 @@ def trans_image(image,trans_range):
     return image_tr
 
 def preprocess_image(image):
+#reduce the image on the interesting part
+  image = image[60:140,:]
+
 #get gray and hls color spaces  
   gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
   hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
@@ -85,9 +88,6 @@ def preprocess_image(image):
   image[:,:,0] = extractContour(gray)#gray
   image[:,:,1] = extractContour(image[:,:,0])#red
   image[:,:,2] = extractContour(hls[:,:,2])#saturation
-
-#reduce the image on the interesting part
-  image = image[60:140,:]
 
 #resize the image for the model
   image = cv2.resize(image, (64,64))
