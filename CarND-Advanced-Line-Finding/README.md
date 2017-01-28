@@ -52,7 +52,7 @@ The pipeline is executed in the module "lineDetection.py" function "process_colo
 In the main function of module "lineDetection.py" the camera matrix, distortion coefficients and the used image shape are loaded. If required the test image is resized to this predefined shape.
 
 In Line 106 again the image is distortion corrected calling  "cv2.undistort()".
-:
+
 ![alt text][image2]
 
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
@@ -67,7 +67,8 @@ Function "binaryFromYUV" (line 88 to 95) transform the image to the YUV color sp
 Combining these different binary masks leads to a good filter for for white and yellow lines.
 
 Here's an example of my output for this step.
-![alt text][image4]
+
+![alt text][image6]
 
 I experimented as well using magnitude and direction gradient functions, but they did not improve the results. I found better results, concentrating on the approbiate color spaces and dynamic thresholds.
 
@@ -77,6 +78,7 @@ The code in module "transformPerspective.py" includes a function "transformPersp
 
 The transformation matrix has been calculated in the main function in "transformPerspective.py" lines 64 through 100.
 It loades an image I selected from an video stream, because it shows a nearly perfect straight, flat road.
+
 ![alt text][image3].
 
 On the undistorded image, I manually extracted image coordinates for the two lines and defined object coordinates.
@@ -97,7 +99,8 @@ The calculated perspective matrix and the invers matrix are stored in a pickle f
 They are loaded and returned in a dictionary by calling "getPerspective" in module "transformPerspective.py".
 
 I decided to transform the perspective, before I build the binary mask. The results have been slightly better.
-![alt text][image5].
+
+![alt text][image7].
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
@@ -114,7 +117,7 @@ The following steps are applied:
 The example shows the found peaks and the splines. On the left line blue points are peaks, red a spline points.
 On the right line blue again are peak, green are spline points.
 
-![find lines][output_images/test5_debug.jpg]
+![alt text][image8]
 
 ####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
@@ -131,7 +134,7 @@ The relative position of the vehicle is calculated in function "calcOffset" in t
 
 I implemented this step in lines 13 through 33 in my code in "lineDetection.py" in the function "drawLinesOnRoad()".  Here is an example of my result on a test image:
 
-![draw lines][output_images/test5_result.jpg]
+![alt text][image9]
 
 ---
 
