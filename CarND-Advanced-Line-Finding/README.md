@@ -13,12 +13,15 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./output_images/calibration1_undist.jpg "Undistorted"
-[image2]: ./output_images/test5_birdeye.jpg "Road Transformed"
-[image3]: ./output_images/test5_binary.jpg "Binary Example"
-[image4]: ./output_images/test5_warped.jpg "Warp Example"
-[image5]: ./output_images/test5_debug.jpg "Fit Visual"
-[image6]: ./output_images/test5_result.jpg "Output"
+[image1]: ./output_images/calibration1_undist.jpg "Undistorted chess board"
+[image2]: ./output_images/test5_undist.jpg "Distortion Corrected"
+[image3]: ./output_images/solidWhiteRight_1280_720_undist.jpg "straight lines"
+[image4]: ./output_images/solidWhiteRight_1280_720_check.jpg "verify camera perspective"
+[image5]: ./output_images/test5_birdeye.jpg "Road Transformed"
+[image6]: ./output_images/test5_binary.jpg "Binary Example"
+[image7]: ./output_images/test5_warped.jpg "Warp Example"
+[image8]: ./output_images/test5_debug.jpg "Fit Visual"
+[image9]: ./output_images/test5_result.jpg "Output"
 [video1]: ./project_result.mp4 "Video"
 
 ###Camera Calibration
@@ -41,7 +44,7 @@ To show the result of the calibration, function "showCalibrateImage()" can be us
 Finally in the main function of the calibration module all test images are read and calibrated using the found distortion correction using the "cv2.undistort()". They are stored in the "output_images" folder.
 
 One distortion corrected camera test image is shown below:
-![undistorded chess board][output_images/calibration1_undist.jpg]
+![alt text][image1]
 
 ###Pipeline (single images)
 The pipeline is executed in the module "lineDetection.py" function "process_colored_image".
@@ -50,7 +53,7 @@ In the main function of module "lineDetection.py" the camera matrix, distortion 
 
 In Line 106 again the image is distortion corrected calling  "cv2.undistort()".
 :
-![distortion corrected][output_images/test5_undist.jpg]
+![alt text][image2]
 
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 I used a combination of different color channels and thresholds to generate a binary image at line 112 in module "lineDetection.py" calling "binaryFromColorspaces" in the module "imageProcessing.py". 
@@ -64,7 +67,7 @@ Function "binaryFromYUV" (line 88 to 95) transform the image to the YUV color sp
 Combining these different binary masks leads to a good filter for for white and yellow lines.
 
 Here's an example of my output for this step.
-![binary mask][output_images/test5_binary.jpg]
+![alt text][image4]
 
 I experimented as well using magnitude and direction gradient functions, but they did not improve the results. I found better results, concentrating on the approbiate color spaces and dynamic thresholds.
 
@@ -74,7 +77,7 @@ The code in module "transformPerspective.py" includes a function "transformPersp
 
 The transformation matrix has been calculated in the main function in "transformPerspective.py" lines 64 through 100.
 It loades an image I selected from an video stream, because it shows a nearly perfect straight, flat road.
-![undistorted test image][output_images/solidWhiteRight_1280_720_undist.jpg].
+![alt text][image3].
 
 On the undistorded image, I manually extracted image coordinates for the two lines and defined object coordinates.
 This resulted in the following source and destination points:
@@ -88,13 +91,13 @@ This resulted in the following source and destination points:
 
 I verified that my perspective transform was working as expected by drawing the "SRC" and "DST" points onto the test image and its warped counterpart to verify that the lines appear parallel in the warped image.For this I created function "showPerspectiveTransformation()" in "transformPerspective.py" lines 24 through 42.
 
-![warped][output_images/solidWhiteRight_1280_720_check.jpg].
+![alt text][image4].
 
 The calculated perspective matrix and the invers matrix are stored in a pickle file "perspective.p".
 They are loaded and returned in a dictionary by calling "getPerspective" in module "transformPerspective.py".
 
 I decided to transform the perspective, before I build the binary mask. The results have been slightly better.
-![warped test image][output_images/test5_birdeye.jpg].
+![alt text][image5].
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
