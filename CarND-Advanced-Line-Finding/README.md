@@ -91,7 +91,7 @@ This resulted in the following source and destination points:
 | 702, 448      | 930, 0        |
 | 1080, 692     | 930, 720      |
 
-I verified that my perspective transform was working as expected by drawing the `SRC` and `DST` points onto the test image and its warped counterpart to verify that the lines appear parallel in the warped image.For this I created function `showPerspectiveTransformation()` in `transformPerspective.py` lines 24 through 42.
+I verified that my perspective transform was working as expected by drawing the `SRC` and `DST` points onto the test image and its warped counterpart to verify that the lines appear parallel in the warped image. For this I created function `showPerspectiveTransformation()` in `transformPerspective.py` lines 24 through 42.
 
 ![alt text][image4].
 
