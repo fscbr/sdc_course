@@ -120,12 +120,12 @@ alt="Demo Video" width="480" height="270" border="10" /></a>
 
 <table>
 <thead><tr><th>File</th><th>Description</th></tr></thead>
-<tr><td>model.py</td><td>the script to create and train the model. Parameters are define at line 97. Especially data_dir needs to be adapted to the local environment</td></tr>
-<tr><td>drive.py</td><td>the script to drive the car. Command line paramter "model" has to be provided</td></tr>
-<tr><td>preprocess.py</td><td>the script to do the preprocessing. It is called from drive and model scripts</td></tr>
-<tr><td>README.MD</td><td>project documentation</td></tr>
-<tr><td>model.json</td><td>the model configuration</td></tr>
-<tr><td>model.h5</td><td>the model weights</td></tr>
+<tr><td>model.py</td><td>The script to create and train the model. Parameters are define at line 97. Especially "data_dir" needs to be adapted to the local environment</td></tr>
+<tr><td>drive.py</td><td>The script to drive the car. Command line paramter "model" has to be provided</td></tr>
+<tr><td>preprocess.py</td><td>The script to do the preprocessing. It is called from drive and model scripts</td></tr>
+<tr><td>README.MD</td><td>This file. The project documentation</td></tr>
+<tr><td>model.json</td><td>The model configuration</td></tr>
+<tr><td>model.h5</td><td>The model weights</td></tr>
 </table>
 
 #System Environment
