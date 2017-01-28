@@ -79,7 +79,7 @@ The code in module `transformPerspective.py` includes a function `transformPersp
 The transformation matrix has been calculated in the main function in `transformPerspective.py` lines 64 through 100.
 It loades an image I selected from an video stream, because it shows a nearly perfect straight, flat road.
 
-![alt text][image3].
+![alt text][image3]
 
 On the undistorded image, I manually extracted image coordinates for the two lines and defined object coordinates.
 This resulted in the following source and destination points:
@@ -93,14 +93,14 @@ This resulted in the following source and destination points:
 
 I verified that my perspective transform was working as expected by drawing the `SRC` and `DST` points onto the test image and its warped counterpart to verify that the lines appear parallel in the warped image. For this I created function `showPerspectiveTransformation()` in `transformPerspective.py` lines 24 through 42.
 
-![alt text][image4].
+![alt text][image4]
 
 The calculated perspective matrix and the invers matrix are stored in a pickle file `perspective.p`.
 They are loaded and returned in a dictionary by calling `getPerspective()` in module `transformPerspective.py`.
 
 I decided to transform the perspective, before I build the binary mask. The results have been slightly better.
 
-![alt text][image7].
+![alt text][image7]
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
