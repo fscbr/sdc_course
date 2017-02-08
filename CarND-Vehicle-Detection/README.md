@@ -58,17 +58,18 @@ I gained maximum classification accuracy when using RGB or HSL,  spatial and  ho
 
 The results for the different combinations are shown in the table below:
 
-|Color space| Spatial | Histogram | HOG | Accuracy |
-| RGB | ALL | True | True | True class="hintergrundfarbe8"| 0.9875 |
+|Color space|Channels| Spatial | Histogram | HOG | Accuracy |
+|:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
+| RGB       |  ALL   | True    | True      | True|   0.9875 |
 | RGB | ALL | False | True | True | 0.97 |
-| RGB | ALL | True | False | True class="hintergrundfarbe8"| 0.985 |
+| RGB | ALL | True | False | True | 0.985 |
 | RGB | ALL | False | False | True | 0.9675 |
 | RGB | ALL | True | True | False | 0.91 |
 | RGB | ALL | False | True | False | 0.5125 |
 | RGB | ALL | True | False | False | 0.9 |
-| HSV | ALL | True | True | True class="hintergrundfarbe8"| 0.9925 |
+| HSV | ALL | True | True | True | 0.9925 |
 | HSV | ALL | False | True | True | 0.975 |
-| HSV | ALL | True | False | True class="hintergrundfarbe8"| 0.985 |
+| HSV | ALL | True | False | True | 0.985 |
 | HSV | ALL | False | False | True | 0.97 |
 | HSV | ALL | True | True | False | 0.94 |
 | HSV | ALL | False | True | False | 0.75 |
@@ -80,7 +81,7 @@ The results for the different combinations are shown in the table below:
 | LUV | ALL | True | True | False | 0.95 |
 | LUV | ALL | False | True | False | 0.7875 |
 | LUV | ALL | True | False | False | 0.92 |
-| HLS | ALL | True | True | True class="hintergrundfarbe8"| 0.99 |
+| HLS | ALL | True | True | True | 0.99 |
 | HLS | ALL | False | True | True | 0.9675 |
 | HLS | ALL | True | False | True | 0.9875 |
 | HLS | ALL | False | False | True | 0.9625 |
@@ -88,12 +89,7 @@ The results for the different combinations are shown in the table below:
 | HLS | ALL | False | True | False | 0.7325 |
 | HLS | ALL | True | False | False | 0.92 |
 | YUV | ALL | True | True | True | 0.985 |
-| YUV | ALL | False | True | True | 0.9675 ||Color space| Spatial | Histogram | HOG | Accuracy |
-| RGB | ALL | True | True | True | 0.995 |
-| HSV | ALL | True | True | True | 0.985 |
-| HLS | ALL | True | True | True | 0.9925 |
-| YCrCb | 0,2 | True | True | True | 0.985 |
-
+| YUV | ALL | False | True | True | 0.9675 |
 | YUV | 0 | True | False | True | 0.9825 |
 | YUV | 1 | True | False | True | 0.955 |
 | YUV | 2 | True | False | True | 0.9475 |
@@ -101,9 +97,9 @@ The results for the different combinations are shown in the table below:
 | YUV | ALL | True | True | False | 0.935 |
 | YUV | ALL | False | True | False | 0.5125 |
 | YUV | ALL | True | False | False | 0.9375 |
-| YCrCb | ALL | True | True | True class="hintergrundfarbe8"| 0.9875 |
+| YCrCb | ALL | True | True | True | 0.9875 |
 | YCrCb | ALL | False | True | True | 0.975 |
-| YCrCb | ALL | True | False | True class="hintergrundfarbe8"| 0.9875 |
+| YCrCb | ALL | True | False | True | 0.9875 |
 | YCrCb | ALL | False | False | True | 0.97 |
 | YCrCb | ALL | True | True | False | 0.93 |
 | YCrCb | ALL | False | True | False | 0.5125 |
@@ -115,7 +111,8 @@ I found best result for RGB, HLS; HSV and YCrCb color space, histogram feature d
 In a second round I trained the best color spaces for combinations of their color channels using hog only. 
 Only YCrCb showed a better result, when reducing the color channels.
 
-|Color space| Spatial | Histogram | HOG | Accuracy |
+|Color space|Channels| Spatial | Histogram | HOG | Accuracy |
+|:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
 | RGB | 0,1 | False | False | True | 0.94 |
 | RGB | 0,2 | False | False | True | 0.96 |
 | RGB | 1,2 | False | False | True | 0.9575 |
@@ -126,12 +123,13 @@ Only YCrCb showed a better result, when reducing the color channels.
 | HLS | 0,2 | False | False | True | 0.9125 |
 | HLS | 1,2 | False | False | True | 0.965 |
 | YCrCb | 0,1 | False | False | True | 0.9725 |
-| YCrCb | 0,2 | False | False | True class="hintergrundfarbe8"| 0.975 |
+| YCrCb | 0,2 | False | False | True | 0.975 |
 | YCrCb | 1,2 | False | False | True | 0.92 |
 
 In a last round I double checked the results:
 
-|Color space| Spatial | Histogram | HOG | Accuracy |
+|Color space|Channels| Spatial | Histogram | HOG | Accuracy |
+|:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
 | RGB | ALL | True | True | True | 0.995 |
 | HSV | ALL | True | True | True | 0.985 |
 | HLS | ALL | True | True | True | 0.9925 |
