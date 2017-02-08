@@ -60,7 +60,7 @@ The results for the different combinations are shown in the table below:
 
 |Color space|Channels| Spatial | Histogram | HOG | Accuracy |
 |:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
-| RGB       |  ALL   | True    | True      | True|+  0.9875 |
+| RGB       |  ALL   | True    | True      | True|```diff+  0.9875 ```|
 | RGB | ALL | False | True | True | 0.97 |
 | RGB | ALL | True | False | True | 0.985 |
 | RGB | ALL | False | False | True | 0.9675 |
