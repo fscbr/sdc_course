@@ -60,14 +60,14 @@ The results for the different combinations are shown in the table below:
 
 |Color space|Channels| Spatial | Histogram | HOG | Accuracy |
 |:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
-| RGB       |  ALL   | True    | True      | True|   0.9875 |
+| RGB       |  ALL   | True    | True      | True|+  0.9875 |
 | RGB | ALL | False | True | True | 0.97 |
 | RGB | ALL | True | False | True | 0.985 |
 | RGB | ALL | False | False | True | 0.9675 |
 | RGB | ALL | True | True | False | 0.91 |
 | RGB | ALL | False | True | False | 0.5125 |
-| RGB | ALL | True | False | False |class="hintergrundfarbe9"| 0.9 |
-| HSV | ALL | True | True | True | class="hintergrundfarbe9"| 0.9925 |
+| RGB | ALL | True | False | False |+ 0.9 |
+| HSV | ALL | True | True | True | + 0.9925 |
 | HSV | ALL | False | True | True | 0.975 |
 | HSV | ALL | True | False | True | 0.985 |
 | HSV | ALL | False | False | True | 0.97 |
@@ -81,7 +81,7 @@ The results for the different combinations are shown in the table below:
 | LUV | ALL | True | True | False | 0.95 |
 | LUV | ALL | False | True | False | 0.7875 |
 | LUV | ALL | True | False | False | 0.92 |
-| HLS | ALL | True | True | True |class="hintergrundfarbe9"| 0.99 |
+| HLS | ALL | True | True | True |+ 0.99 |
 | HLS | ALL | False | True | True | 0.9675 |
 | HLS | ALL | True | False | True | 0.9875 |
 | HLS | ALL | False | False | True | 0.9625 |
@@ -97,9 +97,9 @@ The results for the different combinations are shown in the table below:
 | YUV | ALL | True | True | False | 0.935 |
 | YUV | ALL | False | True | False | 0.5125 |
 | YUV | ALL | True | False | False | 0.9375 |
-| YCrCb | ALL | True | True | True |class="hintergrundfarbe9"| 0.9875 |
+| YCrCb | ALL | True | True | True |+ 0.9875 |
 | YCrCb | ALL | False | True | True | 0.975 |
-| YCrCb | ALL | True | False | True |class="hintergrundfarbe9"| 0.9875 |
+| YCrCb | ALL | True | False | True |+ 0.9875 |
 | YCrCb | ALL | False | False | True | 0.97 |
 | YCrCb | ALL | True | True | False | 0.93 |
 | YCrCb | ALL | False | True | False | 0.5125 |
@@ -122,7 +122,7 @@ Only YCrCb showed a better result, when reducing the color channels.
 | HLS | 0,1 | False | False | True | 0.9575 |
 | HLS | 0,2 | False | False | True | 0.9125 |
 | HLS | 1,2 | False | False | True | 0.965 |
-| YCrCb | 0,1 | False | False | True |class="hintergrundfarbe9"| 0.9725 |
+| YCrCb | 0,1 | False | False | True |+ 0.9725 |
 | YCrCb | 0,2 | False | False | True | 0.975 |
 | YCrCb | 1,2 | False | False | True | 0.92 |
 
@@ -130,7 +130,7 @@ In a last round I double checked the results:
 
 |Color space|Channels| Spatial | Histogram | HOG | Accuracy |
 |:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
-| RGB | ALL | True | True | True |class="hintergrundfarbe9"| 0.995 |
+| RGB | ALL | True | True | True |+ 0.995 |
 | HSV | ALL | True | True | True | 0.985 |
 | HLS | ALL | True | True | True | 0.9925 |
 | YCrCb | 0,2 | True | True | True | 0.985 |
