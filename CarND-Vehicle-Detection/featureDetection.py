@@ -47,7 +47,7 @@ def color_hist(img, nbins=32, bins_range=(0, 256)):
 
 # Define a function to extract features from a list of images
 # Have this function call bin_spatial() and color_hist()
-def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
+def extractFeatures(imgs, color_space='RGB', spatial_size=(32, 32),
                         hist_bins=32, orient=9, 
                         pix_per_cell=8, cell_per_block=2, hog_channel=0,
                         spatial_feat=True, hist_feat=True, hog_feat=True,feature_vec=True):
@@ -59,7 +59,7 @@ def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
         # Read in each one by one
         image = mpimg.imread(file)
         
-        img_features = single_img_features(image,color_space,spatial_size,hist_bins,orient, 
+        img_features = singleImgFeatures(image,color_space,spatial_size,hist_bins,orient, 
                         pix_per_cell,cell_per_block,hog_channel,
                         spatial_feat,hist_feat,hog_feat,feature_vec)        
         
@@ -71,7 +71,7 @@ def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
 # Define a function to extract features from a single image window
 # This function is very similar to extract_features()
 # just for a single image rather than list of images
-def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
+def singleImgFeatures(img, color_space='RGB', spatial_size=(32, 32),
                         hist_bins=32, orient=9, 
                         pix_per_cell=8, cell_per_block=2, hog_channel=0,
                         spatial_feat=True, hist_feat=True, hog_feat=True,feature_vec=True):    
@@ -173,21 +173,21 @@ def slideWindow(img, x_start_stop=[None, None], y_start_stop=[None, None],
     for ys in range(ny_windows):
         starty = int(ys*ny_pix_per_step + y_start_stop[0])
         endy = starty + xy_window[1]
-        if endy > y_start_stop[1]:
+        if endy > y_start_stop[1]+1:
           print("endy:",endy, y_start_stop[1],(endy - y_start_stop[1]),xy_window[1])
           continue
 
-        if ys == ny_windows-1 and endy < y_start_stop[1]:
+        if ys == ny_windows-1 and endy < y_start_stop[1]-1:
           print("endy:",endy, y_start_stop[1],(endy - y_start_stop[1]),xy_window[1])
             
         for xs in range(nx_windows):
             # Calculate window position
             startx = int(xs*nx_pix_per_step + x_start_stop[0])
             endx = startx + xy_window[0]
-            if endx > x_start_stop[1]:
+            if endx > x_start_stop[1]+1:
               print("endx:",endx, x_start_stop[1],(endx - x_start_stop[1]),xy_window[0])
               continue
-            if xs == nx_windows-1 and endx < x_start_stop[1]:
+            if xs == nx_windows-1 and endx < x_start_stop[1]-1:
               print("endx:",endx, x_start_stop[1],(endx - x_start_stop[1]),xy_window[0])
             # Append window position to list
             window_list.append(((startx, starty), (endx, endy)))
@@ -221,7 +221,7 @@ def searchWindowsOptimized(img, windows, clf, scaler, color_space='RGB',
         features = []
         test_img = cv2.resize(img[window[0][1]:window[1][1], window[0][0]:window[1][0]], (64, 64))      
         #4) Extract features for that window using single_img_features()       
-        features = single_img_features(test_img, color_space=color_space, 
+        features = singleImgFeatures(test_img, color_space=color_space, 
                           spatial_size=spatial_size, hist_bins=hist_bins, 
                           orient=orient, pix_per_cell=pix_per_cell, 
                           cell_per_block=cell_per_block, 
@@ -276,7 +276,7 @@ def searchWindows(img, windows, clf, scaler, color_space='RGB',
         #3) Extract the test window from original image
         test_img = cv2.resize(img[window[0][1]:window[1][1], window[0][0]:window[1][0]], (64, 64))      
         #4) Extract features for that window using single_img_features()
-        features = single_img_features(test_img, color_space=color_space, 
+        features = singleImgFeatures(test_img, color_space=color_space, 
                             spatial_size=spatial_size, hist_bins=hist_bins, 
                             orient=orient, pix_per_cell=pix_per_cell, 
                             cell_per_block=cell_per_block, 
@@ -297,4 +297,25 @@ def searchWindows(img, windows, clf, scaler, color_space='RGB',
     #8) Return windows for positive detections
     return on_windows
         
+
+# Define a function to draw bounding boxes
+def drawBoxes(img, bboxes, color=(0, 0, 255), thick=6):
+    # Make a copy of the image
+    imcopy = np.copy(img)
+    # Iterate through the bounding boxes
+    for bbox in bboxes:
+        # Draw a rectangle given bbox coordinates
+        cv2.rectangle(imcopy, bbox[0], bbox[1], color, thick)
+    # Return the image copy with boxes drawn
+    return imcopy
+
+
+#for logging bad situations
+def saveImageAndReturn(image, name, image_counter):
+  imageName = "{0}{1}.png".format(name,image_counter)
+
+  path_to_image = os.path.join("hardNegativeTest",imageName)
+  scipy.misc.imsave(path_to_image, image)
+  print("stored image:",imageName)
+  return image       
 
