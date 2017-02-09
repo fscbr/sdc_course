@@ -150,7 +150,7 @@ def train(param,cars,notcars):
     
   orient = 9  # HOG orientations
   pix_per_cell = 8 # HOG pixels per cell
-  cell_per_block = 2 # HOG cells per block
+  cell_per_block = 3 # HOG cells per block
   spatial_size = (16, 16) # Spatial binning dimensions
   hist_bins = 16    # Number of histogram bins
 
@@ -211,7 +211,7 @@ if __name__ == '__main__':
   (cars,notcars) = readDatabase(False)
 
 #train the best choice
-  param = ("RGB","ALL",True,True,True)
+  param = ("RGB","ALL",True,False,True)
   print("train best param")
   (X_scaler,svc,acccuracy) = train(param,cars,notcars)
 
