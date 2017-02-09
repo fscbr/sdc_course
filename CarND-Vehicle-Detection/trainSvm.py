@@ -5,18 +5,18 @@ import cv2
 import glob
 import time
 from sklearn.svm import SVC
-from sklearn.svm import LinearSVC
 from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import GridSearchCV
 from skimage.feature import hog
 import scipy.misc
 import pickle
 import featureDetection as fd
 
 # NOTE: the next import is only valid for scikit-learn version <= 0.17
-from sklearn.cross_validation import train_test_split
+#from sklearn.cross_validation import train_test_split
 # for scikit-learn >= 0.18 use:
-#from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -108,15 +108,6 @@ def readDatabase(reducedSamples):
 #answer a list of param for optimization
 def getParamlist3():
   params = (
-    ("YUV","ALL",True,True,True),
-    ("YUV","0,2",True,True,True),
-    ("YUV","0,2",False,True,True),
-    ("YUV","0,2",True,False,True),
-    ("YUV","0,2",False,False,True),
-    ("YUV","0,2",True,True,False),
-    ("YUV","0,2",False,True,False),
-    ("YUV","0,2",True,False,False),
-    ("YUV","0,2",False,False,False),
     ("YCrCb","ALL",True,True,True),
     ("YCrCb","0,1",True,True,True),
     ("YCrCb","0,1",False,True,True),
@@ -162,7 +153,6 @@ def getParamlist():
     ("HSV","ALL",True,True,False),
     ("HSV","ALL",False,True,False),
     ("HSV","ALL",True,False,False),
-    #error
     ("LUV","ALL",True,True,True),
     ("LUV","ALL",False,True,True),
     ("LUV","ALL",True,False,True),
@@ -179,7 +169,7 @@ def getParamlist():
     ("HLS","ALL",True,False,False),
     ("YUV","ALL",True,True,True),
     ("YUV","ALL",False,True,True),
-#error    ("YUV","ALL",True,False,True),
+    ("YUV","ALL",True,False,True),
     ("YUV","ALL",False,False,True),
     ("YUV","ALL",True,True,False),
     ("YUV","ALL",False,True,False),
@@ -195,7 +185,7 @@ def getParamlist():
 
 #train a list of parameters
 def trainParamlist(cars,notcars):
-  params = getParamlist3()
+  params = getParamlist()
 
   results = {}
   #train the list
@@ -216,7 +206,7 @@ def trainParamlist(cars,notcars):
     (color_space,hog_channel,spatial_feat,hist_feat,hog_feat) = key
 
     if key in best:
-      print("|",color_space,"|",hog_channel,"|",spatial_feat,"|",hist_feat,"|",hog_feat,"| ** ",accuracy," ** |")
+      print("|",color_space,"|",hog_channel,"|",spatial_feat,"|",hist_feat,"|",hog_feat,"| **",accuracy,"** |")
     else:
       print("|",color_space,"|",hog_channel,"|",spatial_feat,"|",hist_feat,"|",hog_feat,"|",accuracy,"|")
     
@@ -226,7 +216,7 @@ def train(param,cars,notcars):
     
   orient = 9  # HOG orientations
   pix_per_cell = 8 # HOG pixels per cell
-  cell_per_block = 2 # HOG cells per block
+  cell_per_block = 3 # HOG cells per block
   spatial_size = (16, 16) # Spatial binning dimensions
   hist_bins = 16    # Number of histogram bins
 
@@ -285,7 +275,7 @@ if __name__ == '__main__':
     print("train all params")
     trainParamlist(cars,notcars)
 
-  if True:  
+  if False:  
 #read all
     print("read full size database")
     (cars,notcars) = readDatabase(False)
@@ -302,4 +292,40 @@ if __name__ == '__main__':
     with open(SVC_PATH, 'wb') as f:
       pickle.dump(data, file=f)    
     
+  if True:
+    scores = ['precision', 'recall']
 
+# Set the parameters by cross-validation
+    tuned_parameters = [{'loss':["hinge","modified_huber","squared_hinge"],'alpha': [0.00001,0.0001,0.001,0.01],"penalty":["l1","l2","elasticnet"]}]
+
+    scores = ['precision', 'recall']
+
+    for score in scores:
+      print("# Tuning hyper-parameters for %s" % score)
+      print()
+
+      clf = GridSearchCV(SGDClassifier(shuffle=True, fit_intercept=False, n_jobs=-1, learning_rate="optimal", penalty="l2", class_weight="balanced",n_iter=5), tuned_parameters, cv=5,
+                       scoring='%s_macro' % score)
+      clf.fit(X_train, y_train)
+
+      print("Best parameters set found on development set:")
+      print()
+      print(clf.best_params_)
+      print()
+      print("Grid scores on development set:")
+      print()
+      means = clf.cv_results_['mean_test_score']
+      stds = clf.cv_results_['std_test_score']
+      for mean, std, params in zip(means, stds, clf.cv_results_['params']):
+        print("%0.3f (+/-%0.03f) for %r"
+              % (mean, std * 2, params))
+      print()
+
+      print("Detailed classification report:")
+      print()
+      print("The model is trained on the full development set.")
+      print("The scores are computed on the full evaluation set.")
+      print()
+      y_true, y_pred = y_test, clf.predict(X_test)
+      print(classification_report(y_true, y_pred))
+      print()

@@ -1,23 +1,18 @@
-##Writeup Template
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
-
-**Vehicle Detection Project**
+##Vehicle Detection Project##
 
 The goals / steps of this project are the following:
 
 * Perform a Histogram of Oriented Gradients (HOG) feature extraction on a labeled training set of images and train a classifier Linear SVM classifier
-* Optionally, you can also apply a color transform and append binned color features, as well as histograms of color, to your HOG feature vector. 
-* Note: for those first two steps don't forget to normalize your features and randomize a selection for training and testing.
-* Implement a sliding-window technique and use your trained classifier to search for vehicles in images.
-* Run your pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
+* Optionally, apply a color transform and append binned color features, as well as histograms of color, to the HOG feature vector. 
+* Note: for those first two steps don't forget to normalize features and randomize a selection for training and testing.
+* Implement a sliding-window technique and use a trained classifier to search for vehicles in images.
+* Run a pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
 * Estimate a bounding box for vehicles detected.
 
 [//]: # (Image References)
 [image1]: ./output_images/samples_cars_not_cars.png.png
-[image2]: ./output_images/hog_example.jpg
-[image3]: ./output_images/96searchwindow.jpg
+[image2]: ./output_images/hog_example.png
+[image3]: ./output_images/96searchwindow.png
 [image4]: ./output_images/sliding_window_testImages.jpg
 [image4]: ./output_images/sliding_window_video.jpg
 [image4]: ./output_images/sliding_window_heatmap.jpg
@@ -27,24 +22,22 @@ The goals / steps of this project are the following:
 [video1]: ./project_video.mp4
 
 ---
-###Writeup / README
-
 ###Histogram of Oriented Gradients (HOG)
 
 ####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is in module `trainSvm.py` function readDatabase().  
-If True as parameter is handed over, only a randomized subset of samples is loaded and returned
+The code for this step is in module `trainSvm.py` function `readDatabase()` at line 80 through 106. 
+If True as a parameter is handed over, only a randomized subset of 2000 samples is loaded and returned.
 
 As database for the training I used the a combination of the GTI vehicle image database, the KITTI vision benchmark suite, and examples extracted from the project video itself offered on the project repository.
 
-The database contains 8792 vehicles and 8968 noon vehicles
+The database contains 8792 vehicles and 8968 non-vehicles
 
-I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
+I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of some images of the `vehicle` and `non-vehicle` classes:
 
 ![alt text][image1]
 
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
+I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feeling for what the `skimage.hog()` output looks like.
 
 Here is an example using the `RGB` color space and HOG parameters of `orientations=9`, `pixels_per_cell=(8, 8)` and `cells_per_block=(3, 3)`:
 
@@ -53,7 +46,7 @@ Here is an example using the `RGB` color space and HOG parameters of `orientatio
 
 ####2. Explain how you settled on your final choice of HOG parameters.
 
-In module `trainSvm.py` I created a function `trainParamlist()` that loops over a list of parameter compinations. It uses the above described randomized subset of the database.
+In module `trainSvm.py` I created a function `trainParamlist()` (line 196 through 220) that loops over a list of parameter combinations. It uses the above described randomized subset of the database.
 
 First I examined for the combination of colorspaces (RGB, HSV, HLS, YUV, LUV, YCrCb), the combination of color space channels, the feature spaces (spatial,histogram,hog) 
 I gained maximum classification accuracy when using RGB or HSL,  spatial and  hog featurs, but no histogram features.
@@ -80,7 +73,7 @@ The results for the different combinations are shown in the table below:
 | LUV | ALL | False | True | True | 0 |
 | LUV | ALL | True | False | True | 0 |
 | LUV | ALL | False | False | True | 0 |
-| LUV | ALL | True | True | False | **  0.9938  ** |
+| LUV | ALL | True | True | False | **0.9938** |
 | LUV | ALL | False | True | False | 0.9788 |
 | LUV | ALL | True | False | False | 0.98 |
 | HLS | ALL | True | True | True | 0.9875 |
@@ -90,7 +83,7 @@ The results for the different combinations are shown in the table below:
 | HLS | ALL | True | True | False | 0.9838 |
 | HLS | ALL | False | True | False | 0.9812 |
 | HLS | ALL | True | False | False | 0.9075 |
-| YUV | ALL | True | True | True | **  0.995  ** |
+| YUV | ALL | True | True | True | **0.995** |
 | YUV | ALL | False | True | True | 0.9888 |
 | YUV | 0 | True | False | True | 0.9812 |
 | YUV | 1 | True | False | True | 0.985 |
@@ -99,9 +92,9 @@ The results for the different combinations are shown in the table below:
 | YUV | ALL | True | True | False | 0.9638 |
 | YUV | ALL | False | True | False | 0.4812 |
 | YUV | ALL | True | False | False | 0.9512 |
-| YCrCb | ALL | True | True | True | **  0.9938  ** |
+| YCrCb | ALL | True | True | True | **0.9938** |
 | YCrCb | ALL | False | True | True | 0.99 |
-| YCrCb | ALL | True | False | True | **  0.995  ** |
+| YCrCb | ALL | True | False | True | **0.995** |
 | YCrCb | ALL | False | False | True | 0.9875 |
 | YCrCb | ALL | True | True | False | 0.965 |
 | YCrCb | ALL | False | True | False | 0.4812 |
@@ -114,19 +107,19 @@ Only YCrCb showed a better result, when reducing the color channels.
 
 |Color space|Channels| Spatial | Histogram | HOG | Accuracy |
 |:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
-| YUV | ALL | False | False | True | **  0.9862  ** |
+| YUV | ALL | False | False | True | **0.9862** |
 | YUV | 0 | False | False | True | 0.9638 |
 | YUV | 1 | False | False | True | 0.9238 |
 | YUV | 2 | False | False | True | 0.885 |
 | YUV | 0,1 | False | False | True | 0.9775 |
-| YUV | 0,2 | False | False | True | **  0.9862  ** |
+| YUV | 0,2 | False | False | True | **0.9862** |
 | YUV | 1,2 | False | False | True | 0.94 |
 | YCrCb | All | False | False | True | 0 |
 | YCrCb | 0 | False | False | True | 0.965 |
 | YCrCb | 1 | False | False | True | 0.9288 |
 | YCrCb | 2 | False | False | True | 0.9112 |
-| YCrCb | 0,1 | False | False | True | **  0.99  ** |
-| YCrCb | 0,2 | False | False | True | **  0.9875  ** |
+| YCrCb | 0,1 | False | False | True | **0.99** |
+| YCrCb | 0,2 | False | False | True | **0.9875** |
 | YCrCb | 1,2 | False | False | True | 0.9475 |
 
 LUV was not able to train because of NaN values in the scaler that caused exceptions. I did not look into that as I got high accuracies on other parmeters
@@ -137,19 +130,19 @@ In the last round I trained these other feature combinations.
 
 |Color space|Channels| Spatial | Histogram | HOG | Accuracy |
 |:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
-| YUV | ALL | True | True | True | **  0.9925  ** |
+| YUV | ALL | True | True | True | **0.9925** |
 | YUV | 0,2 | True | True | True | 0.9912 |
 | YUV | 0,2 | False | True | True | 0.9838 |
-| YUV | 0,2 | True | False | True | **  0.9912  ** |
+| YUV | 0,2 | True | False | True | **0.9912** |
 | YUV | 0,2 | False | False | True | 0.9875 |
 | YUV | 0,2 | True | True | False | 0.95 |
 | YUV | 0,2 | False | True | False | 0.4812 |
 | YUV | 0,2 | True | False | False | 0.9625 |
 | YUV | 0,2 | False | False | False | 0 |
-| YCrCb | ALL | True | True | True | **  0.9962  ** |
+| YCrCb | ALL | True | True | True | **0.9962** |
 | YCrCb | 0,1 | True | True | True | 0.9875 |
 | YCrCb | 0,1 | False | True | True | 0.99 |
-| YCrCb | 0,1 | True | False | True | **  0.9938  ** |
+| YCrCb | 0,1 | True | False | True | **0.9938** |
 | YCrCb | 0,1 | False | False | True | 0.9862 |
 | YCrCb | 0,1 | True | True | False | 0.9625 |
 | YCrCb | 0,1 | False | True | False | 0.4812 |
@@ -161,22 +154,21 @@ The accuracy for the choosen parameters is 0.9837 for all images.
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using the class SGDClassifier. In the main function at `trainSvm.py` line 132 through 179. The already loaded car and notcar datasets and the train parameters are handed over to the function.
+I trained a linear SVM using the class SGDClassifier. In the main function at `trainSvm.py` line 266 through 293. The already loaded car and notcar datasets and the train parameters are handed over to the function `train()` at line 215 through 263.
 
-First the features are extracted calling the `extract_features()` function in module `featureDetection.py`
-the two feature sets are stacked in a two line matrix calling vstack. a label column is added to the feature matrix(label 1 for cars and label 0 for notcars) in lines 157 through 165.
+First the features are extracted calling the `extractFeatures()` function in module `featureDetection.py`
+the two feature sets are stacked in a two line matrix calling vstack. a label column is added to the feature matrix(label 1 for cars and label 0 for notcars) in lines 240 through 247.
 
-In line 162 to 164 the feature matrix is normalized to with 0 mean and unit variance using the class sclearn.prepocessing.StandardScaler.
-The fit method calculates the mean and standard deviation, which is used for scaling. Calling transform, the data is scaled.
+In line 242 to 245 the feature matrix is normalized to 0 mean and unit variance using the class sclearn.prepocessing.StandardScaler. The fit method calculates the mean and standard deviation, which is used for scaling. Calling transform, the data is scaled.
 
-The feature matrix is devided in a randomized 80% train and 20% test dataset calling `train_test_split()`.
+The feature matrix is devided in a randomized 80% train and 20% test dataset calling `train_test_split()` at line 250.
 
-After the preprocessing the Classifier is created in line 173 and trained in line 174.
+After the preprocessing the Classifier is created in line 256 and trained in line 257.
 
-The function returns the scaler object, the trained classifier and the achieved accuracy.
-As the scaler and the trained classifier are needed for future predictions a dictionary is created and stored to a pickle file named `svc.p`.
+The function `train()` returns the scaler object, the trained classifier and the achieved accuracy.
+As the scaler and the trained classifier are needed for future predictions, a dictionary is created and stored to a pickle file named `svc.p` at line 289 to 293.
 
-I choosed the SGDClassifier as it is fast and has more options to optimize. For this reason I created a function gridSearch, which allows to find the best setup for the classifier.
+I choosed the SGDClassifier as it is fast and has more options to optimize. For this reason I created a function `gridSearch`, which allows to find the best setup for the classifier.
 I defined the parameter space for the tuning by `[{'loss':["hinge","modified_huber","squared_hinge"],'alpha': [0.00001,0.0001,0.001,0.01],"penalty":["l1","l2","elasticnet"]}]`
 
 The found optimal combination is loss function `hinge`,penalty=`elasticnet` and alpha =`0.0001`.
