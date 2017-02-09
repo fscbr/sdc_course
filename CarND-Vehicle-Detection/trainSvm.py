@@ -14,9 +14,67 @@ import pickle
 import featureDetection as fd
 
 # NOTE: the next import is only valid for scikit-learn version <= 0.17
-#from sklearn.cross_validation import train_test_split
+from sklearn.cross_validation import train_test_split
 # for scikit-learn >= 0.18 use:
-from sklearn.model_selection import train_test_split
+#from sklearn.model_selection import train_test_split
+
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import matplotlib.gridspec as gridspec
+import numpy as np
+    
+#answer a sample or all database images
+def displayDatabaseSample():    
+  # Read in cars and notcars
+  images = glob.glob('database/vehicles/*/*.png')
+  cars = []
+  notcars = []
+  for image in images:
+    cars.append(image)
+
+  images = glob.glob('database/non-vehicles/*/*.png')
+  for image in images:
+    notcars.append(image)
+
+  np.random.seed(1)
+  sample_size = 32
+  random_indizes = np.arange(sample_size)
+  np.random.shuffle(random_indizes)
+
+  cars = np.array(cars)[random_indizes]
+  notcars = np.array(notcars)[random_indizes]
+
+  #show one image for 20 samples
+  row = 0
+  col = 0
+  fig = plt.figure()
+  size = 6
+  gs = gridspec.GridSpec(size, size)
+#  fig.subplots_adjust(top=1.5)
+  for j in range(2):
+   if j == 0:
+     data = cars
+     title = "car"
+   else: 
+     data = notcars
+     title = "no car"
+    
+   for i in range(int(size*size/2)):
+    image = mpimg.imread(data[i])
+    a = plt.subplot(gs[row, col])
+    a.imshow(image.copy())
+    a.get_xaxis().set_visible(False)
+    a.get_yaxis().set_visible(False)
+    a.set_title(title)
+    fig.add_subplot(a)
+    col += 1                   
+    if col == size:
+      col = 0
+      row += 1
+            
+  fig = plt.gcf()
+  fig.savefig("output_images/samples_cars_not_cars.png") 
+  plt.show()
 
 #answer a sample or all database images
 def readDatabase(reducedSamples):    
@@ -35,8 +93,9 @@ def readDatabase(reducedSamples):
   print("min:",np.min(image[0])," max:",np.max(image[0]))
   
   if reducedSamples:    
+    np.random.seed(1)
   # Reduce the sample size for fast testing
-    sample_size = 1000
+    sample_size = 2000
     random_indizes = np.arange(sample_size)
     np.random.shuffle(random_indizes)
 
@@ -49,27 +108,39 @@ def readDatabase(reducedSamples):
 #answer a list of param for optimization
 def getParamlist3():
   params = (
-    ("RGB","ALL",True,True,True),
-    ("HSV","ALL",True,True,True),
-    ("HLS","ALL",True,True,True),
-    ("YCrCb","0,2",True,True,True))
+    ("YUV","ALL",True,True,True),
+    ("YUV","0,2",True,True,True),
+    ("YUV","0,2",False,True,True),
+    ("YUV","0,2",True,False,True),
+    ("YUV","0,2",False,False,True),
+    ("YUV","0,2",True,True,False),
+    ("YUV","0,2",False,True,False),
+    ("YUV","0,2",True,False,False),
+    ("YUV","0,2",False,False,False),
+    ("YCrCb","ALL",True,True,True),
+    ("YCrCb","0,1",True,True,True),
+    ("YCrCb","0,1",False,True,True),
+    ("YCrCb","0,1",True,False,True),
+    ("YCrCb","0,1",False,False,True),
+    ("YCrCb","0,1",True,True,False),
+    ("YCrCb","0,1",False,True,False),
+    ("YCrCb","0,1",True,False,False),
+    ("YCrCb","0,1",False,False,False))
   return params
 
 def getParamlist2():
   params = (
-    ("RGB","ALL",False,False,True),
-    ("RGB","0,1",False,False,True),
-    ("RGB","0,2",False,False,True),
-    ("RGB","1,2",False,False,True),
-    ("HSV","ALL",False,False,True),
-    ("HSV","0,1",False,False,True),
-    ("HSV","0,2",False,False,True),
-    ("HSV","1,2",False,False,True),
-    ("HLS","ALL",False,False,True),
-    ("HLS","0,1",False,False,True),
-    ("HLS","0,2",False,False,True),
-    ("HLS","1,2",False,False,True),
+    ("YUV","ALL",False,False,True),
+    ("YUV",0,False,False,True),
+    ("YUV",1,False,False,True),
+    ("YUV",2,False,False,True),
+    ("YUV","0,1",False,False,True),
+    ("YUV","0,2",False,False,True),
+    ("YUV","1,2",False,False,True),
     ("YCrCb","All",False,False,True),
+    ("YCrCb",0,False,False,True),
+    ("YCrCb",1,False,False,True),
+    ("YCrCb",2,False,False,True),
     ("YCrCb","0,1",False,False,True),
     ("YCrCb","0,2",False,False,True),
     ("YCrCb","1,2",False,False,True))
@@ -109,9 +180,6 @@ def getParamlist():
     ("YUV","ALL",True,True,True),
     ("YUV","ALL",False,True,True),
 #error    ("YUV","ALL",True,False,True),
-   ("YUV",0,True,False,True),
-   ("YUV",1,True,False,True),
-    ("YUV",2,True,False,True),
     ("YUV","ALL",False,False,True),
     ("YUV","ALL",True,True,False),
     ("YUV","ALL",False,True,False),
@@ -139,18 +207,26 @@ def trainParamlist(cars,notcars):
       results[params[i]] = 0
 
   #print result as wiki table
-  print("|Color space| Spatial | Histogram | HOG | Accuracy |")
+  print("|Color space| Channels | Spatial | Histogram | HOG | Accuracy |")
+  best = sorted(results, key=results.get, reverse=True)[0:min(4,len(results))]
   for i in range(len(params)):
-    accuracy = results[params[i]]
-    (color_space,hog_channel,spatial_feat,hist_feat,hog_feat) = params[i]
-    print("|",color_space,"|",hog_channel,"|",spatial_feat,"|",hist_feat,"|",hog_feat,"|",accuracy,"|")
+    key = params[i]
+    accuracy = results[key]
+    
+    (color_space,hog_channel,spatial_feat,hist_feat,hog_feat) = key
+
+    if key in best:
+      print("|",color_space,"|",hog_channel,"|",spatial_feat,"|",hist_feat,"|",hog_feat,"| ** ",accuracy," ** |")
+    else:
+      print("|",color_space,"|",hog_channel,"|",spatial_feat,"|",hist_feat,"|",hog_feat,"|",accuracy,"|")
+    
     
 #train once
 def train(param,cars,notcars):
     
   orient = 9  # HOG orientations
   pix_per_cell = 8 # HOG pixels per cell
-  cell_per_block = 3 # HOG cells per block
+  cell_per_block = 2 # HOG cells per block
   spatial_size = (16, 16) # Spatial binning dimensions
   hist_bins = 16    # Number of histogram bins
 
@@ -198,28 +274,32 @@ def train(param,cars,notcars):
 
 SVC_PATH = "./svc.p"
 if __name__ == '__main__':
-#read a sample
-#  print("read sample database")
-#  (cars,notcars) = readDatabase(True)
+  if False:
+    displayDatabaseSample()
+  #read a sample
+  if False:
+    print("read sample database")
+    (cars,notcars) = readDatabase(True)
+ 
+  #train all for optimization
+    print("train all params")
+    trainParamlist(cars,notcars)
 
-#train all for optimization
-#  print("train all params")
-#  trainParamlist(cars,notcars)
-    
+  if True:  
 #read all
-  print("read full size database")
-  (cars,notcars) = readDatabase(False)
+    print("read full size database")
+    (cars,notcars) = readDatabase(False)
 
 #train the best choice
-  param = ("RGB","ALL",True,False,True)
-  print("train best param")
-  (X_scaler,svc,acccuracy) = train(param,cars,notcars)
+    param = ("YCrCb","0,1",True,False,True)
+    print("train best param")
+    (X_scaler,svc,acccuracy) = train(param,cars,notcars)
 
 #save the calibration in a pickle file
-  data = {}
-  data["X_scaler"]=X_scaler
-  data["svc"]=svc
-  with open(SVC_PATH, 'wb') as f:
-    pickle.dump(data, file=f)    
+    data = {}
+    data["X_scaler"]=X_scaler
+    data["svc"]=svc
+    with open(SVC_PATH, 'wb') as f:
+      pickle.dump(data, file=f)    
     
 

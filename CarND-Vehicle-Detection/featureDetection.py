@@ -318,4 +318,3 @@ def saveImageAndReturn(image, name, image_counter):
   scipy.misc.imsave(path_to_image, image)
   print("stored image:",imageName)
   return image       
-

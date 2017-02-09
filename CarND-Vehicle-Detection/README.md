@@ -15,7 +15,7 @@ The goals / steps of this project are the following:
 * Estimate a bounding box for vehicles detected.
 
 [//]: # (Image References)
-[image1]: ./output_images/car_not_car.png
+[image1]: ./output_images/samples_cars_not_cars.png.png
 [image2]: ./output_images/hog_example.jpg
 [image3]: ./output_images/96searchwindow.jpg
 [image4]: ./output_images/sliding_window_testImages.jpg
@@ -36,7 +36,9 @@ The goals / steps of this project are the following:
 The code for this step is in module `trainSvm.py` function readDatabase().  
 If True as parameter is handed over, only a randomized subset of samples is loaded and returned
 
-As database for the training I used the GTI and KITTI datasets offered on the project page.
+As database for the training I used the a combination of the GTI vehicle image database, the KITTI vision benchmark suite, and examples extracted from the project video itself offered on the project repository.
+
+The database contains 8792 vehicles and 8968 noon vehicles
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
 
@@ -60,51 +62,50 @@ The results for the different combinations are shown in the table below:
 
 |Color space|Channels| Spatial | Histogram | HOG | Accuracy |
 |:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
-| RGB       |  ALL   | True    | True      | True|```diff+  0.9875 ```|
-| RGB | ALL | False | True | True | 0.97 |
-| RGB | ALL | True | False | True | 0.985 |
-| RGB | ALL | False | False | True | 0.9675 |
-| RGB | ALL | True | True | False | 0.91 |
-| RGB | ALL | False | True | False | 0.5125 |
-| RGB | ALL | True | False | False |+ 0.9 |
-| HSV | ALL | True | True | True | + 0.9925 |
-| HSV | ALL | False | True | True | 0.975 |
-| HSV | ALL | True | False | True | 0.985 |
-| HSV | ALL | False | False | True | 0.97 |
-| HSV | ALL | True | True | False | 0.94 |
-| HSV | ALL | False | True | False | 0.75 |
-| HSV | ALL | True | False | False | 0.925 |
+| RGB | ALL | True | True | True | 0.9712 |
+| RGB | ALL | False | True | True | 0.965 |
+| RGB | ALL | True | False | True | 0.9638 |
+| RGB | ALL | False | False | True | 0.9575 |
+| RGB | ALL | True | True | False | 0.8625 |
+| RGB | ALL | False | True | False | 0.4812 |
+| RGB | ALL | True | False | False | 0.8938 |
+| HSV | ALL | True | True | True | 0.9925 |
+| HSV | ALL | False | True | True | 0.9912 |
+| HSV | ALL | True | False | True | 0.99 |
+| HSV | ALL | False | False | True | 0.9838 |
+| HSV | ALL | True | True | False | 0.9775 |
+| HSV | ALL | False | True | False | 0.9525 |
+| HSV | ALL | True | False | False | 0.9062 |
 | LUV | ALL | True | True | True | 0 |
 | LUV | ALL | False | True | True | 0 |
 | LUV | ALL | True | False | True | 0 |
 | LUV | ALL | False | False | True | 0 |
-| LUV | ALL | True | True | False | 0.95 |
-| LUV | ALL | False | True | False | 0.7875 |
-| LUV | ALL | True | False | False | 0.92 |
-| HLS | ALL | True | True | True |+ 0.99 |
-| HLS | ALL | False | True | True | 0.9675 |
-| HLS | ALL | True | False | True | 0.9875 |
-| HLS | ALL | False | False | True | 0.9625 |
-| HLS | ALL | True | True | False | 0.935 |
-| HLS | ALL | False | True | False | 0.7325 |
-| HLS | ALL | True | False | False | 0.92 |
-| YUV | ALL | True | True | True | 0.985 |
-| YUV | ALL | False | True | True | 0.9675 |
-| YUV | 0 | True | False | True | 0.9825 |
-| YUV | 1 | True | False | True | 0.955 |
-| YUV | 2 | True | False | True | 0.9475 |
-| YUV | ALL | False | False | True | 0.9825 |
-| YUV | ALL | True | True | False | 0.935 |
-| YUV | ALL | False | True | False | 0.5125 |
-| YUV | ALL | True | False | False | 0.9375 |
-| YCrCb | ALL | True | True | True |+ 0.9875 |
-| YCrCb | ALL | False | True | True | 0.975 |
-| YCrCb | ALL | True | False | True |+ 0.9875 |
-| YCrCb | ALL | False | False | True | 0.97 |
-| YCrCb | ALL | True | True | False | 0.93 |
-| YCrCb | ALL | False | True | False | 0.5125 |
-| YCrCb | ALL | True | False | False | 0.9325 |
-
+| LUV | ALL | True | True | False | **  0.9938  ** |
+| LUV | ALL | False | True | False | 0.9788 |
+| LUV | ALL | True | False | False | 0.98 |
+| HLS | ALL | True | True | True | 0.9875 |
+| HLS | ALL | False | True | True | 0.99 |
+| HLS | ALL | True | False | True | 0.9925 |
+| HLS | ALL | False | False | True | 0.9912 |
+| HLS | ALL | True | True | False | 0.9838 |
+| HLS | ALL | False | True | False | 0.9812 |
+| HLS | ALL | True | False | False | 0.9075 |
+| YUV | ALL | True | True | True | **  0.995  ** |
+| YUV | ALL | False | True | True | 0.9888 |
+| YUV | 0 | True | False | True | 0.9812 |
+| YUV | 1 | True | False | True | 0.985 |
+| YUV | 2 | True | False | True | 0.9638 |
+| YUV | ALL | False | False | True | 0.99 |
+| YUV | ALL | True | True | False | 0.9638 |
+| YUV | ALL | False | True | False | 0.4812 |
+| YUV | ALL | True | False | False | 0.9512 |
+| YCrCb | ALL | True | True | True | **  0.9938  ** |
+| YCrCb | ALL | False | True | True | 0.99 |
+| YCrCb | ALL | True | False | True | **  0.995  ** |
+| YCrCb | ALL | False | False | True | 0.9875 |
+| YCrCb | ALL | True | True | False | 0.965 |
+| YCrCb | ALL | False | True | False | 0.4812 |
+| YCrCb | ALL | True | False | False | 0.965 |
 
 I found best result for RGB, HLS; HSV and YCrCb color space, histogram feature did not have a large impact.
  
@@ -113,29 +114,50 @@ Only YCrCb showed a better result, when reducing the color channels.
 
 |Color space|Channels| Spatial | Histogram | HOG | Accuracy |
 |:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
-| RGB | 0,1 | False | False | True | 0.94 |
-| RGB | 0,2 | False | False | True | 0.96 |
-| RGB | 1,2 | False | False | True | 0.9575 |
-| HSV | 0,1 | False | False | True | 0.9225 |
-| HSV | 0,2 | False | False | True | 0.96 |
-| HSV | 1,2 | False | False | True | 0.9575 |
-| HLS | 0,1 | False | False | True | 0.9575 |
-| HLS | 0,2 | False | False | True | 0.9125 |
-| HLS | 1,2 | False | False | True | 0.965 |
-| YCrCb | 0,1 | False | False | True |+ 0.9725 |
-| YCrCb | 0,2 | False | False | True | 0.975 |
-| YCrCb | 1,2 | False | False | True | 0.92 |
+| YUV | ALL | False | False | True | **  0.9862  ** |
+| YUV | 0 | False | False | True | 0.9638 |
+| YUV | 1 | False | False | True | 0.9238 |
+| YUV | 2 | False | False | True | 0.885 |
+| YUV | 0,1 | False | False | True | 0.9775 |
+| YUV | 0,2 | False | False | True | **  0.9862  ** |
+| YUV | 1,2 | False | False | True | 0.94 |
+| YCrCb | All | False | False | True | 0 |
+| YCrCb | 0 | False | False | True | 0.965 |
+| YCrCb | 1 | False | False | True | 0.9288 |
+| YCrCb | 2 | False | False | True | 0.9112 |
+| YCrCb | 0,1 | False | False | True | **  0.99  ** |
+| YCrCb | 0,2 | False | False | True | **  0.9875  ** |
+| YCrCb | 1,2 | False | False | True | 0.9475 |
 
-In a last round I double checked the results:
+LUV was not able to train because of NaN values in the scaler that caused exceptions. I did not look into that as I got high accuracies on other parmeters
+YUV color channel 0 and 2 resulted in a high accuracy which offers a smaller feature size and faster processing.
+The same applied for YCrCb color channel 0 and 1
+In the last round I trained these other feature combinations.
+
 
 |Color space|Channels| Spatial | Histogram | HOG | Accuracy |
 |:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
-| RGB | ALL | True | True | True |+ 0.995 |
-| HSV | ALL | True | True | True | 0.985 |
-| HLS | ALL | True | True | True | 0.9925 |
-| YCrCb | 0,2 | True | True | True | 0.985 |
+| YUV | ALL | True | True | True | **  0.9925  ** |
+| YUV | 0,2 | True | True | True | 0.9912 |
+| YUV | 0,2 | False | True | True | 0.9838 |
+| YUV | 0,2 | True | False | True | **  0.9912  ** |
+| YUV | 0,2 | False | False | True | 0.9875 |
+| YUV | 0,2 | True | True | False | 0.95 |
+| YUV | 0,2 | False | True | False | 0.4812 |
+| YUV | 0,2 | True | False | False | 0.9625 |
+| YUV | 0,2 | False | False | False | 0 |
+| YCrCb | ALL | True | True | True | **  0.9962  ** |
+| YCrCb | 0,1 | True | True | True | 0.9875 |
+| YCrCb | 0,1 | False | True | True | 0.99 |
+| YCrCb | 0,1 | True | False | True | **  0.9938  ** |
+| YCrCb | 0,1 | False | False | True | 0.9862 |
+| YCrCb | 0,1 | True | True | False | 0.9625 |
+| YCrCb | 0,1 | False | True | False | 0.4812 |
+| YCrCb | 0,1 | True | False | False | 0.9588 |
+| YCrCb | 0,1 | False | False | False | 0 |
 
-Interestingly the results vary always a bit even when defining a random seed. I chosed RGB and all features.
+Interestingly the results vary always a bit even when defining a random seed. I chosed YCrCb and 0 ,1 color channel spatial and hog features. Its has a smaller feature size, but and accuracy of 99.38%
+The accuracy for the choosen parameters is 0.9837 for all images.
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
