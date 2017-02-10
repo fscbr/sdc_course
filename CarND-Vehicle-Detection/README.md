@@ -16,7 +16,7 @@ The goals / steps of this project are the following:
 [image4]: ./output_images/sliding_window_testImages.jpg
 [image5]: ./output_images/sliding_window_video.jpg
 [image6]: ./output_images/sliding_window_heatmap.jpg
-[image7]: ./output_images/static_results.jpg
+[image7]: ./output_images/static_results.png
 [image8]: ./output_images/bboxes_and_heat.png
 [image9]: ./output_images/labels_map.png
 [image10]: ./output_images/output_bboxes.png
