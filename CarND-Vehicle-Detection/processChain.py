@@ -34,25 +34,7 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
   debugImg = image
 
 #the search area will be created by using the history of detecuions (video mode)
-  if smooth:
-    search_param = ((64,390,486,224,1056,0.5),
-     (96,390,534,38,278,0.5),
-     (96,390,534,1002,1242,0.5),
-     (160,444,659,10,279,0.66),
-     (160,444,659,1002,1271,0.66),
-     (192,430,622,10,333,0.66),
-     (192,430,622,948,1271,0.66))
-     
-    windows += heatmap.getSearchAreas(normImage)
-    result = fd.drawBoxes(result, windows, color=(255,255,255), thick=(2))  
-  else:
-#static mode for test images  
-    search_param = ((64,390,671,10,1270,0.66),
-      (96,390,551,21,1260,0.66),
-      (128,390,605,10,1270,0.66),
-      (160,390,658,19,1266,0.66))  
-    heatmap = hm.Heatmap(0)
-    
+  search_param = getSearchParam(smooth)
   all_hot_windows = []
 #  create the windows list sliding ofver the search area
   for i in range(len(search_param)):  
@@ -61,23 +43,15 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
     new_win = fd.slideWindow(normImage, x_start_stop=(x_start, x_stop), y_start_stop=(y_start, y_stop), 
                     xy_window=(size,size), xy_overlap=(ov, ov))
     
-###    
-#    result = image
-#    hot_windows = searchWindows(normImage, new_win, svc, X_scaler, color_space=color_space, 
-#                      spatial_size=spatial_size, hist_bins=hist_bins, 
-#                      orient=orient, pix_per_cell=pix_per_cell, 
-#                      cell_per_block=cell_per_block, 
-#                      hog_channel=hog_channel, spatial_feat=spatial_feat, 
-#                      hist_feat=hist_feat, hog_feat=hog_feat,hardNegative=False)                       
-#    heatmap.update((image.shape[0],image.shape[1]),hot_windows)
-#    result = drawBoxes(result, new_win, color=(255-(255*i/5), 255*i/5, 0), thick=2)  
-#    result = heatmap.drawLabeledBoxes(result,(255,0,0))
-#    plt.imshow(result)
-#    plt.show()
-####    
-    
-    
     windows += new_win
+
+  if smooth:
+    windows += heatmap.getSearchAreas(normImage)
+    result = fd.drawBoxes(result, windows, color=(255,255,255), thick=(2))  
+  else:
+#static mode for test images  
+    heatmap = hm.Heatmap(1)
+   
 #  print(windows2)
   (color_space,hog_channel,spatial_feat,hist_feat,hog_feat,cell_per_block) = param
   orient = 9  # HOG orientations
@@ -95,9 +69,9 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
 
   if debug:
 #draw the search window grid for debugging                    
-    debugImg = fd.drawBoxes(result, windows, color=(0,255,255), thick=(1))  
-#draw the windows taht got a match for debugging                      
-    debugImg = fd.drawBoxes(result, hot_windows, color=(0, 0, 255), thick=2)                    
+    debugImg = fd.drawBoxes(debugImg, windows, color=(0,255,255), thick=(1))  
+#draw the windows that got a match for debugging                      
+    debugImg = fd.drawBoxes(debugImg, hot_windows, color=(0, 0, 255), thick=2)                    
 
 #update the heatmap    
   heatmap.update((image.shape[0],image.shape[1]),hot_windows)
@@ -110,9 +84,10 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
     if debug:
       debugImg = heatmap.drawLabeledBoxes(debugImg,(0,255,0),True)
   else:
+    heatmap.calcBoxes(result)
     result = heatmap.drawLabeledBoxes(result,(255,0,0),False)
     if debug:
-      debugImg = heatmap.drawLabeledBoxes(debugImg,(0,255,0),True)
+      debugImg = heatmap.drawLabeledBoxes(debugImg,(255,0,0),True)
     
 
   if debug:
@@ -122,14 +97,31 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
     
   return result
 
+#define search parameter for window search.
+def getSearchParam(isSmooth):
+  if isSmooth:
+    search_param = ((64,390,486,224,1056,0.5),
+     (96,390,534,38,278,0.5),
+     (96,390,534,1002,1242,0.5),
+     (160,444,659,10,279,0.66),
+     (160,444,659,1002,1271,0.66),
+     (192,430,622,10,333,0.66),
+     (192,430,622,948,1271,0.66))  
+  else:
+    search_param = ((64,390,650,20,1260,0.66),
+      (96,390,552,21,1260,0.66),
+      (128,390,606,10,1270,0.66))  
+  return search_param
 
+
+
+      
 if __name__ == '__main__':
 
   #init global data
   gd.data["image_counter"]=0
-  gd.data["heatmap"]=hm.Heatmap(0)
-  
-  
+  gd.data["heatmap"]=hm.Heatmap(1)
+   
   print(os.listdir("test_images/"))
   #loop over the test pictures
   resultPath = "result_images/"
@@ -152,7 +144,7 @@ if __name__ == '__main__':
     image = mpimg.imread(path_to_image)    
 
 #call the process chain 
-    result = processColoredImage(image,True,True,item[:-4],X_scaler, svc, param)
+    result = processColoredImage(image,False,True,item[:-4],X_scaler, svc, param)
 
 #display origin and result
     f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))

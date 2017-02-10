@@ -16,10 +16,11 @@ The goals / steps of this project are the following:
 [image4]: ./output_images/sliding_window_testImages.jpg
 [image5]: ./output_images/sliding_window_video.jpg
 [image6]: ./output_images/sliding_window_heatmap.jpg
-[image7]: ./output_images/bboxes_and_heat.png
-[image8]: ./output_images/labels_map.png
-[image9]: ./output_images/output_bboxes.png
-[video1]: ./project_video.mp4
+[image7]: ./output_images/static_results.jpg
+[image8]: ./output_images/bboxes_and_heat.png
+[image9]: ./output_images/labels_map.png
+[image10]: ./output_images/output_bboxes.png
+[video1]: ./project_result.mp4
 
 ---
 ###Histogram of Oriented Gradients (HOG)
@@ -177,10 +178,13 @@ The function creates for an area of interest, for a defined scale and an overlap
 I expected to use larger scales for closer object (== higher y values) and smaller scales for more distant objects (== lower y values).
 I choosed always quadratic windows, as the database images are as well quadratic and the perspective tranformation should be linear on both axis.
 
-The overlap should not to be too big as its increases the amount of search windows and therefor computation costs.
+I played with different scales and found that three scales (64,96 and 128) are sufficient.
+
+The overlap should not to be too big in an large search area, as it increases the amount of search windows and therefore computation costs.
 I choosed as area of interest for y values between 390 and 660 to cover the lane area and to surpress the visible part of the car cockpit.
 
-For the test images I used an area of interest from left to right as there is now history of detections available.
+For the test images, I used an area of interest from left to right as there is now history of detections available.
+Overlay is between 0.66 and 0.5. 
 
 ![alt text][image4]
 
@@ -188,24 +192,43 @@ For the video processing, I choosed an area at the low left and low right as ent
 
 ![alt text][image5]
 
-The later described heat map is used to provide areas of interest, where cars have been detected in previous images.
-I defined a symetric grid around the expected car position to track it through the following images.
-The grid uses scales 64, 96 and 128 pixel and have an overlap of 0.66.
+The later described heat map is used to provide small search areas, where cars have been detected in previous images and the future position is forecasted.
+I defined a symetric grid around the expected car position to track it through the images stream. The grid is created at `getSearchAreas()` in the module `heatmap.py` line 98 through 126 and uses scales 64, 96 and 128 pixel having an overlap of 0.9.
 
 ![alt text][image6]
 
 ####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-I choosed the SGDClassifier as it is fast and has more options to optimize. For this reason I created a function `gridSearch`, which allows to find the best setup for the classifier.
+The pipeline for the processing is defined in the method `processColoredImage()` module `processChain.py`.
+
+First the image is resized, if required at line 25. Then the image is scaled between 0 and 1 following the training images format.
+
+In line 37 through 46 the search parameters for the sliding windows are set and the window list is created calling `slideWindow()` of module `featureDetection.py`.
+
+The search area retrieved from the heat map is added to the window search list at line 49 calling `getSearchAreas()` of module `heatmap.py`.
+This function takes all forecasted car positions and lays a grid around these positions.
+
+The window list is searched at line 63 calling `searchWindows()` of module `featureDetection.py` using the same parameter as in the training. 
+I choosed YCrCb 2-channel HOG features plus spatially binned color in the feature vector.
+The hog parameters are orient = 9, pix_per_cell = 8, cell per block = 3.
+
+The function `searchWindows()` loops over the windows list, resizes the image to (64,64) scale like the database images. It then creates the feature vector and normalizes it using the same scales as 
+used in the training part.
+
+In the function I added a  flag `hardNegative`. If this is activated all windows predicted as label `car' are stored in a separate folder.
+This images are then manually verified to add them to the non-vehicle or vehicle database folder. Executing a retraining improves significantly the accuracy of the classifier in 1 to 3 cycles.
+
+I choosed the SGDClassifier as it is fast and has more options to optimize. For this reason I created a function `gridSearch` in the module `trainSvm.py`.
+
+It allows to find the best setup for the classifier looping a multi-dimensional parameter space.
 I defined the parameter space for the tuning by `[{'loss':["hinge","modified_huber","squared_hinge"],'alpha': [0.00001,0.0001,0.001,0.01],"penalty":["l1","l2","elasticnet"]}]`
 
-The found optimal combination is loss function `hinge`,penalty=`elasticnet` and alpha =`0.0001`.
+The found optimal parameters are: `loss=`hinge`,`penalty=`elasticnet` and `alpha=`0.0001`.
 
-I tried to get a good signal to noise ratio having a higher amount of windows around the expected car position. The more hit are stored in the heat map, the less false detections occure. For sure this cost computation power, but as the search area kept small, teh performance is still acceptable.
+I decided have large overlay of search windows around the expected car position to improve the signal / error ratio. The more hit are stored in the heat map, the less false detections occure. 
+For sure this costs computation power, but as I kept the search area  small, the performance is still good.
 
-Ultimately I searched on two scales using YCrCb 2-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
-
-![alt text][image4]
+![alt text][image7]
 ---
 
 ### Video Implementation
@@ -215,6 +238,7 @@ Here's a [link to my video result](./project_video.mp4)
 
 
 ####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
+This ensures usually more than one hit for a vehicle and helps to increase the signal / error ratio.
 
 I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
 
