@@ -155,14 +155,9 @@ def slideWindow(img, x_start_stop=[None, None], y_start_stop=[None, None],
     nx_pix_per_step = xy_window[0]*(1 - xy_overlap[0])
     ny_pix_per_step = xy_window[1]*(1 - xy_overlap[1])
     # Compute the number of windows in x/y
-    nx_windows = np.int(xspan/nx_pix_per_step)
-    ny_windows = np.int(yspan/ny_pix_per_step)
-    
-    if xy_overlap[0] > 0:
-        nx_windows -=1
-    if xy_overlap[1] > 0:
-        ny_windows -=1
-        
+    nx_windows = int((xspan - xy_window[0])/nx_pix_per_step+1)
+    ny_windows = int((yspan - xy_window[1])/ny_pix_per_step+1)
+
 #    print(xspan,yspan,nx_pix_per_step ,ny_pix_per_step, nx_windows,ny_windows)
     # Initialize a list to append window positions to
     window_list = []
@@ -170,25 +165,29 @@ def slideWindow(img, x_start_stop=[None, None], y_start_stop=[None, None],
     # Note: you could vectorize this step, but in practice
     # you'll be considering windows one by one with your
     # classifier, so looping makes sense
+#    print("startx:",x_start_stop[0]," endx:",x_start_stop[1],xy_window[0],nx_windows)
+#    print("starty:",y_start_stop[0]," endy:",y_start_stop[1],xy_window[1],ny_windows)
     for ys in range(ny_windows):
         starty = int(ys*ny_pix_per_step + y_start_stop[0])
         endy = starty + xy_window[1]
+#        print("ys:",ys," starty:",starty," endy:",endy, y_start_stop[1],xy_window[1])
         if endy > y_start_stop[1]+1:
-          print("endy:",endy, y_start_stop[1],(endy - y_start_stop[1]),xy_window[1])
+          print("reduce endy:",endy, y_start_stop[1],(endy - y_start_stop[1]),xy_window[1])
           continue
 
         if ys == ny_windows-1 and endy < y_start_stop[1]-1:
-          print("endy:",endy, y_start_stop[1],(endy - y_start_stop[1]),xy_window[1])
+          print("extend endy:",endy, y_start_stop[1],(endy - y_start_stop[1]),xy_window[1])
             
         for xs in range(nx_windows):
             # Calculate window position
             startx = int(xs*nx_pix_per_step + x_start_stop[0])
             endx = startx + xy_window[0]
+#            print("xs:",xs," startx:",startx," endx:",endx, x_start_stop[1],xy_window[0])
             if endx > x_start_stop[1]+1:
-              print("endx:",endx, x_start_stop[1],(endx - x_start_stop[1]),xy_window[0])
+              print("reduce endx:",endx, x_start_stop[1],(endx - x_start_stop[1]),xy_window[0])
               continue
             if xs == nx_windows-1 and endx < x_start_stop[1]-1:
-              print("endx:",endx, x_start_stop[1],(endx - x_start_stop[1]),xy_window[0])
+              print("extend endx:",endx, x_start_stop[1],(endx - x_start_stop[1]),xy_window[0])
             # Append window position to list
             window_list.append(((startx, starty), (endx, endy)))
     # Return the list of windows

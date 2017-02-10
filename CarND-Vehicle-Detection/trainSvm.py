@@ -7,16 +7,16 @@ import time
 from sklearn.svm import SVC
 from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import GridSearchCV
+#from sklearn.model_selection import GridSearchCV
 from skimage.feature import hog
 import scipy.misc
 import pickle
 import featureDetection as fd
 
 # NOTE: the next import is only valid for scikit-learn version <= 0.17
-#from sklearn.cross_validation import train_test_split
+from sklearn.cross_validation import train_test_split
 # for scikit-learn >= 0.18 use:
-from sklearn.model_selection import train_test_split
+#from sklearn.model_selection import train_test_split
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -108,33 +108,33 @@ def readDatabase(reducedSamples):
 #answer a list of param for optimization
 def getParamlist3():
   params = (
-    ("YCrCb","ALL",True,True,True),
-    ("YCrCb","0,1",True,True,True),
-    ("YCrCb","0,1",False,True,True),
-    ("YCrCb","0,1",True,False,True),
-    ("YCrCb","0,1",False,False,True),
-    ("YCrCb","0,1",True,True,False),
-    ("YCrCb","0,1",False,True,False),
-    ("YCrCb","0,1",True,False,False),
-    ("YCrCb","0,1",False,False,False))
+    ("YCrCb","ALL",True,True,True,3),
+    ("YCrCb","0,1",True,True,True,3),
+    ("YCrCb","0,1",False,True,True,3),
+    ("YCrCb","0,1",True,False,True,3),
+    ("YCrCb","0,1",False,False,True,3),
+    ("YCrCb","0,1",True,True,False,3),
+    ("YCrCb","0,1",False,True,False,3),
+    ("YCrCb","0,1",True,False,False,3),
+    ("YCrCb","0,1",False,False,False,3))
   return params
 
 def getParamlist2():
   params = (
-    ("YUV","ALL",False,False,True),
-    ("YUV",0,False,False,True),
-    ("YUV",1,False,False,True),
-    ("YUV",2,False,False,True),
-    ("YUV","0,1",False,False,True),
-    ("YUV","0,2",False,False,True),
-    ("YUV","1,2",False,False,True),
-    ("YCrCb","All",False,False,True),
-    ("YCrCb",0,False,False,True),
-    ("YCrCb",1,False,False,True),
-    ("YCrCb",2,False,False,True),
-    ("YCrCb","0,1",False,False,True),
-    ("YCrCb","0,2",False,False,True),
-    ("YCrCb","1,2",False,False,True))
+    ("YUV","ALL",False,False,True,3),
+    ("YUV",0,False,False,True,3),
+    ("YUV",1,False,False,True,3),
+    ("YUV",2,False,False,True,3),
+    ("YUV","0,1",False,False,True,3),
+    ("YUV","0,2",False,False,True,3),
+    ("YUV","1,2",False,False,True,3),
+    ("YCrCb","All",False,False,True,3),
+    ("YCrCb",0,False,False,True,3),
+    ("YCrCb",1,False,False,True,3),
+    ("YCrCb",2,False,False,True,3),
+    ("YCrCb","0,1",False,False,True,3),
+    ("YCrCb","0,2",False,False,True,3),
+    ("YCrCb","1,2",False,False,True,3))
   return params
 
 def getParamlist():
@@ -216,11 +216,10 @@ def train(param,cars,notcars):
     
   orient = 9  # HOG orientations
   pix_per_cell = 8 # HOG pixels per cell
-  cell_per_block = 3 # HOG cells per block
   spatial_size = (16, 16) # Spatial binning dimensions
   hist_bins = 16    # Number of histogram bins
 
-  (color_space,hog_channel,spatial_feat,hist_feat,hog_feat) = param
+  (color_space,hog_channel,spatial_feat,hist_feat,hog_feat,cell_per_block) = param
 #  print(i," params:", params[i])  
 
   car_features = fd.extractFeatures(cars, color_space=color_space, 
@@ -263,6 +262,15 @@ def train(param,cars,notcars):
   return (X_scaler,svc,accuracy)
 
 SVC_PATH = "./svc.p"
+#load a pickle file and return the model dictionary  containg the keys X_scaler and svc
+def getModelData():
+  data = {}
+  #load trained svc
+  with open(SVC_PATH, "rb") as f:
+    data = pickle.load(f)
+  return data
+
+  
 if __name__ == '__main__':
   if False:
     displayDatabaseSample()
@@ -275,24 +283,25 @@ if __name__ == '__main__':
     print("train all params")
     trainParamlist(cars,notcars)
 
-  if False:  
+  if True:  
 #read all
     print("read full size database")
     (cars,notcars) = readDatabase(False)
 
 #train the best choice
-    param = ("YCrCb","0,1",True,False,True)
+    param = ("YCrCb","0,1",True,False,True,3)
     print("train best param")
     (X_scaler,svc,acccuracy) = train(param,cars,notcars)
 
 #save the calibration in a pickle file
     data = {}
-    data["X_scaler"]=X_scaler
-    data["svc"]=svc
+    data["X_scaler"] = X_scaler
+    data["svc"] = svc
+    data["param"] = param
     with open(SVC_PATH, 'wb') as f:
       pickle.dump(data, file=f)    
     
-  if True:
+  if False:
     scores = ['precision', 'recall']
 
 # Set the parameters by cross-validation
@@ -304,9 +313,9 @@ if __name__ == '__main__':
       print("# Tuning hyper-parameters for %s" % score)
       print()
 
-      clf = GridSearchCV(SGDClassifier(shuffle=True, fit_intercept=False, n_jobs=-1, learning_rate="optimal", penalty="l2", class_weight="balanced",n_iter=5), tuned_parameters, cv=5,
-                       scoring='%s_macro' % score)
-      clf.fit(X_train, y_train)
+#      clf = GridSearchCV(SGDClassifier(shuffle=True, fit_intercept=False, n_jobs=-1, learning_rate="optimal", penalty="l2", class_weight="balanced",n_iter=5), tuned_parameters, cv=5,
+#                       scoring='%s_macro' % score)
+#      clf.fit(X_train, y_train)
 
       print("Best parameters set found on development set:")
       print()
@@ -329,3 +338,5 @@ if __name__ == '__main__':
       y_true, y_pred = y_test, clf.predict(X_test)
       print(classification_report(y_true, y_pred))
       print()
+
+      
