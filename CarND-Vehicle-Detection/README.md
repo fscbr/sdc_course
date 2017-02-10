@@ -10,15 +10,15 @@ The goals / steps of this project are the following:
 * Estimate a bounding box for vehicles detected.
 
 [//]: # (Image References)
-[image1]: ./output_images/samples_cars_not_cars.png.png
+[image1]: ./output_images/samples_cars_not_cars.png
 [image2]: ./output_images/hog_example.png
 [image3]: ./output_images/96searchwindow.png
 [image4]: ./output_images/sliding_window_testImages.jpg
-[image4]: ./output_images/sliding_window_video.jpg
-[image4]: ./output_images/sliding_window_heatmap.jpg
-[image5]: ./output_images/bboxes_and_heat.png
-[image6]: ./output_images/labels_map.png
-[image7]: ./output_images/output_bboxes.png
+[image5]: ./output_images/sliding_window_video.jpg
+[image6]: ./output_images/sliding_window_heatmap.jpg
+[image7]: ./output_images/bboxes_and_heat.png
+[image8]: ./output_images/labels_map.png
+[image9]: ./output_images/output_bboxes.png
 [video1]: ./project_video.mp4
 
 ---
@@ -168,42 +168,42 @@ After the preprocessing the Classifier is created in line 256 and trained in lin
 The function `train()` returns the scaler object, the trained classifier and the achieved accuracy.
 As the scaler and the trained classifier are needed for future predictions, a dictionary is created and stored to a pickle file named `svc.p` at line 289 to 293.
 
-I choosed the SGDClassifier as it is fast and has more options to optimize. For this reason I created a function `gridSearch`, which allows to find the best setup for the classifier.
-I defined the parameter space for the tuning by `[{'loss':["hinge","modified_huber","squared_hinge"],'alpha': [0.00001,0.0001,0.001,0.01],"penalty":["l1","l2","elasticnet"]}]`
-
-The found optimal combination is loss function `hinge`,penalty=`elasticnet` and alpha =`0.0001`.
-
 ###Sliding Window Search
 
 ####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 The search windows are created in function `slideWindows()` in module `featureDetection.py` at line 140 through 195.
 
-The fuction creates for an area of interest, for a defined scale and an overlap ratio as many windows as fit into the search area.
+The function creates for an area of interest, for a defined scale and an overlap ratio as many windows as fit into the search area.
 I expected to use larger scales for closer object (== higher y values) and smaller scales for more distant objects (== lower y values).
 I choosed always quadratic windows, as the database images are as well quadratic and the perspective tranformation should be linear on both axis.
 
 The overlap should not to be too big as its increases the amount of search windows and therefor computation costs.
-I choosed as area of interest for y values between 390 and 660 to cover th elane area and to surpress the visible part of the car cockpit.
+I choosed as area of interest for y values between 390 and 660 to cover the lane area and to surpress the visible part of the car cockpit.
 
 For the test images I used an area of interest from left to right as there is now history of detections available.
+
+![alt text][image4]
+
 For the video processing, I choosed an area at the low left and low right as entry area for overtaking cars. I added a high center area for vehicles that are over taken.
 
-The later described heat map is used to provide areas of interest where cars have been detected in previous images.
+![alt text][image5]
 
+The later described heat map is used to provide areas of interest, where cars have been detected in previous images.
+I defined a symetric grid around the expected car position to track it through the following images.
+The grid uses scales 64, 96 and 128 pixel and have an overlap of 0.66.
 
-
-During the tests with the project video, I recognized that 
-
-
-For the test images I created a grid of windows for y values above 390 to cover the lane area.
-First I choosed 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
-
-![alt text][image3]
+![alt text][image6]
 
 ####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+I choosed the SGDClassifier as it is fast and has more options to optimize. For this reason I created a function `gridSearch`, which allows to find the best setup for the classifier.
+I defined the parameter space for the tuning by `[{'loss':["hinge","modified_huber","squared_hinge"],'alpha': [0.00001,0.0001,0.001,0.01],"penalty":["l1","l2","elasticnet"]}]`
+
+The found optimal combination is loss function `hinge`,penalty=`elasticnet` and alpha =`0.0001`.
+
+I tried to get a good signal to noise ratio having a higher amount of windows around the expected car position. The more hit are stored in the heat map, the less false detections occure. For sure this cost computation power, but as the search area kept small, teh performance is still acceptable.
+
+Ultimately I searched on two scales using YCrCb 2-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
 
 ![alt text][image4]
 ---
