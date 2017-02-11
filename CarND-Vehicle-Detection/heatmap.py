@@ -69,7 +69,7 @@ class Heatmap():
         mxy = self.getMovement((xc,yc))
         (mx,my) = mxy
         
-        print(xc,yc,"->",mx,my)     
+#        print(xc,yc,"->",mx,my)     
         #forecast the nesxt postion
         self.forecast.append((xc+mx,yc+my))
 
@@ -137,7 +137,7 @@ class Heatmap():
       
     if not bestxy is None:
       (hxc,hyc,width,height) = bestxy 
-      print("movement: ",xc-hxc,yc-hyc)
+#      print("movement: ",xc-hxc,yc-hyc)
       return (xc-hxc,yc-hyc)
     return (0,0)
     

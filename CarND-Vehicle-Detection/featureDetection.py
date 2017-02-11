@@ -158,19 +158,15 @@ def slideWindow(img, x_start_stop=[None, None], y_start_stop=[None, None],
     nx_windows = int((xspan - xy_window[0])/nx_pix_per_step+1)
     ny_windows = int((yspan - xy_window[1])/ny_pix_per_step+1)
 
-#    print(xspan,yspan,nx_pix_per_step ,ny_pix_per_step, nx_windows,ny_windows)
     # Initialize a list to append window positions to
     window_list = []
     # Loop through finding x and y window positions
     # Note: you could vectorize this step, but in practice
     # you'll be considering windows one by one with your
     # classifier, so looping makes sense
-#    print("startx:",x_start_stop[0]," endx:",x_start_stop[1],xy_window[0],nx_windows)
-#    print("starty:",y_start_stop[0]," endy:",y_start_stop[1],xy_window[1],ny_windows)
     for ys in range(ny_windows):
         starty = int(ys*ny_pix_per_step + y_start_stop[0])
         endy = starty + xy_window[1]
-#        print("ys:",ys," starty:",starty," endy:",endy, y_start_stop[1],xy_window[1])
         if endy > y_start_stop[1]+1:
           print("reduce endy:",endy, y_start_stop[1],(endy - y_start_stop[1]),xy_window[1])
           continue
@@ -182,7 +178,6 @@ def slideWindow(img, x_start_stop=[None, None], y_start_stop=[None, None],
             # Calculate window position
             startx = int(xs*nx_pix_per_step + x_start_stop[0])
             endx = startx + xy_window[0]
-#            print("xs:",xs," startx:",startx," endx:",endx, x_start_stop[1],xy_window[0])
             if endx > x_start_stop[1]+1:
               print("reduce endx:",endx, x_start_stop[1],(endx - x_start_stop[1]),xy_window[0])
               continue

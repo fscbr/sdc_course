@@ -1,3 +1,4 @@
+import argparse
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,16 +8,17 @@ import time
 from sklearn.svm import SVC
 from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import StandardScaler
-#from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
 from skimage.feature import hog
 import scipy.misc
 import pickle
 import featureDetection as fd
 
 # NOTE: the next import is only valid for scikit-learn version <= 0.17
-from sklearn.cross_validation import train_test_split
+#from sklearn.cross_validation import train_test_split
 # for scikit-learn >= 0.18 use:
-#from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -93,6 +95,7 @@ def readDatabase(reducedSamples):
   print("min:",np.min(image[0])," max:",np.max(image[0]))
   
   if reducedSamples:    
+    print("read sample database")
     np.random.seed(1)
   # Reduce the sample size for fast testing
     sample_size = 2000
@@ -101,6 +104,8 @@ def readDatabase(reducedSamples):
 
     cars = np.array(cars)[random_indizes]
     notcars = np.array(notcars)[random_indizes]
+  else:
+    print("read database")
 
   print("cars:",len(cars)," not cars:",len(notcars))
   return (cars,notcars)
@@ -137,55 +142,54 @@ def getParamlist2():
     ("YCrCb","1,2",False,False,True,3))
   return params
 
-def getParamlist():
+def getParamlist1():
   params = (
-    ("RGB","ALL",True,True,True),
-    ("RGB","ALL",False,True,True),
-    ("RGB","ALL",True,False,True),
-    ("RGB","ALL",False,False,True),
-    ("RGB","ALL",True,True,False),
-    ("RGB","ALL",False,True,False),
-    ("RGB","ALL",True,False,False),
-    ("HSV","ALL",True,True,True),
-    ("HSV","ALL",False,True,True),
-    ("HSV","ALL",True,False,True),
-    ("HSV","ALL",False,False,True),
-    ("HSV","ALL",True,True,False),
-    ("HSV","ALL",False,True,False),
-    ("HSV","ALL",True,False,False),
-    ("LUV","ALL",True,True,True),
-    ("LUV","ALL",False,True,True),
-    ("LUV","ALL",True,False,True),
-    ("LUV","ALL",False,False,True),
-    ("LUV","ALL",True,True,False),
-    ("LUV","ALL",False,True,False),
-    ("LUV","ALL",True,False,False),
-    ("HLS","ALL",True,True,True),
-    ("HLS","ALL",False,True,True),
-    ("HLS","ALL",True,False,True),
-    ("HLS","ALL",False,False,True),
-    ("HLS","ALL",True,True,False),
-    ("HLS","ALL",False,True,False),
-    ("HLS","ALL",True,False,False),
-    ("YUV","ALL",True,True,True),
-    ("YUV","ALL",False,True,True),
-    ("YUV","ALL",True,False,True),
-    ("YUV","ALL",False,False,True),
-    ("YUV","ALL",True,True,False),
-    ("YUV","ALL",False,True,False),
-    ("YUV","ALL",True,False,False),
-    ("YCrCb","ALL",True,True,True),
-    ("YCrCb","ALL",False,True,True),
-    ("YCrCb","ALL",True,False,True),
-    ("YCrCb","ALL",False,False,True),
-    ("YCrCb","ALL",True,True,False),
-    ("YCrCb","ALL",False,True,False),
-    ("YCrCb","ALL",True,False,False))
+    ("RGB","ALL",True,True,True,3),
+    ("RGB","ALL",False,True,True,3),
+    ("RGB","ALL",True,False,True,3),
+    ("RGB","ALL",False,False,True,3),
+    ("RGB","ALL",True,True,False,3),
+    ("RGB","ALL",False,True,False,3),
+    ("RGB","ALL",True,False,False,3),
+    ("HSV","ALL",True,True,True,3),
+    ("HSV","ALL",False,True,True,3),
+    ("HSV","ALL",True,False,True,3),
+    ("HSV","ALL",False,False,True,3),
+    ("HSV","ALL",True,True,False,3),
+    ("HSV","ALL",False,True,False,3),
+    ("HSV","ALL",True,False,False,3),
+    ("LUV","ALL",True,True,True,3),
+    ("LUV","ALL",False,True,True,3),
+    ("LUV","ALL",True,False,True,3),
+    ("LUV","ALL",False,False,True,3),
+    ("LUV","ALL",True,True,False,3),
+    ("LUV","ALL",False,True,False,3),
+    ("LUV","ALL",True,False,False,3),
+    ("HLS","ALL",True,True,True,3),
+    ("HLS","ALL",False,True,True,3),
+    ("HLS","ALL",True,False,True,3),
+    ("HLS","ALL",False,False,True,3),
+    ("HLS","ALL",True,True,False,3),
+    ("HLS","ALL",False,True,False,3),
+    ("HLS","ALL",True,False,False,3),
+    ("YUV","ALL",True,True,True,3),
+    ("YUV","ALL",False,True,True,3),
+    ("YUV","ALL",True,False,True,3),
+    ("YUV","ALL",False,False,True,3),
+    ("YUV","ALL",True,True,False,3),
+    ("YUV","ALL",False,True,False,3),
+    ("YUV","ALL",True,False,False,3),
+    ("YCrCb","ALL",True,True,True,3),
+    ("YCrCb","ALL",False,True,True,3),
+    ("YCrCb","ALL",True,False,True,3),
+    ("YCrCb","ALL",False,False,True,3),
+    ("YCrCb","ALL",True,True,False,3),
+    ("YCrCb","ALL",False,True,False,3),
+    ("YCrCb","ALL",True,False,False,3))
   return params
 
 #train a list of parameters
-def trainParamlist(cars,notcars):
-  params = getParamlist()
+def trainParamlist(cars,notcars,params):
 
   results = {}
   #train the list
@@ -209,18 +213,18 @@ def trainParamlist(cars,notcars):
       print("|",color_space,"|",hog_channel,"|",spatial_feat,"|",hist_feat,"|",hog_feat,"| **",accuracy,"** |")
     else:
       print("|",color_space,"|",hog_channel,"|",spatial_feat,"|",hist_feat,"|",hog_feat,"|",accuracy,"|")
-    
-    
-#train once
-def train(param,cars,notcars):
-    
+
+#create normalized, randomly shuffelded test and train data for a parameter set    
+def getFeatures(param,cars,notcars):
+  print(param)
+
+  (color_space,hog_channel,spatial_feat,hist_feat,hog_feat,cell_per_block) = param
+#  print(i," params:", params[i])  
+
   orient = 9  # HOG orientations
   pix_per_cell = 8 # HOG pixels per cell
   spatial_size = (16, 16) # Spatial binning dimensions
   hist_bins = 16    # Number of histogram bins
-
-  (color_space,hog_channel,spatial_feat,hist_feat,hog_feat,cell_per_block) = param
-#  print(i," params:", params[i])  
 
   car_features = fd.extractFeatures(cars, color_space=color_space, 
                         spatial_size=spatial_size, hist_bins=hist_bins, 
@@ -248,11 +252,18 @@ def train(param,cars,notcars):
   rand_state = 1
   X_train, X_test, y_train, y_test = train_test_split(
     scaled_X, y, test_size=0.2, random_state=rand_state)
-  print(param)
+
   print(' using:',orient,'orientations',pix_per_cell,'pixels per cell and', cell_per_block,'cells per block -> feature vector length:', len(X_train[0]))
 
+  return (X_train,X_test,y_train,y_test,X_scaler)
+    
+#train once
+def train(param,cars,notcars):
+    
+  (X_train, X_test, y_train, y_test,X_scaler) = getFeatures(param,cars,notcars)
+
 #train
-  svc = SGDClassifier(fit_intercept=False, loss="hinge", n_jobs=-1, learning_rate="optimal", penalty="elasticnet", class_weight="balanced",n_iter=10)
+  svc = SGDClassifier(fit_intercept=False, loss="squared_hinge", n_jobs=-1, learning_rate="optimal", penalty="elasticnet", class_weight="balanced",n_iter=10, alpha=0.01)
   svc.fit(X_train, y_train)
 
 #get the accuracy      
@@ -270,64 +281,34 @@ def getModelData():
     data = pickle.load(f)
   return data
 
-  
-if __name__ == '__main__':
-  if False:
-    displayDatabaseSample()
-  #read a sample
-  if False:
-    print("read sample database")
-    (cars,notcars) = readDatabase(True)
- 
-  #train all for optimization
-    print("train all params")
-    trainParamlist(cars,notcars)
+#search optimal classifier paramter
+def gridSearch(cars,notcars,param):
+  (X_train, X_test, y_train, y_test, X_scaler) = getFeatures(param,cars,notcars)
 
-  if True:  
-#read all
-    print("read full size database")
-    (cars,notcars) = readDatabase(False)
+  scores = ['precision', 'recall']
 
-#train the best choice
-    param = ("YCrCb","0,1",True,False,True,3)
-    print("train best param")
-    (X_scaler,svc,acccuracy) = train(param,cars,notcars)
+  # Set the parameters space
+  tuned_parameters = [{'loss':["hinge","modified_huber","squared_hinge"],'alpha': [0.00001,0.0001,0.001,0.01],"penalty":["l1","l2","elasticnet"]}]
 
-#save the calibration in a pickle file
-    data = {}
-    data["X_scaler"] = X_scaler
-    data["svc"] = svc
-    data["param"] = param
-    with open(SVC_PATH, 'wb') as f:
-      pickle.dump(data, file=f)    
-    
-  if False:
-    scores = ['precision', 'recall']
+  scores = ['precision', 'recall']
 
-# Set the parameters by cross-validation
-    tuned_parameters = [{'loss':["hinge","modified_huber","squared_hinge"],'alpha': [0.00001,0.0001,0.001,0.01],"penalty":["l1","l2","elasticnet"]}]
+  for score in scores:
+    print("# Tuning hyper-parameters for %s" % score)
+    print()
 
-    scores = ['precision', 'recall']
+    clf = GridSearchCV(SGDClassifier(shuffle=True, fit_intercept=False, n_jobs=-1, learning_rate="optimal", penalty="l2", class_weight="balanced",n_iter=5), tuned_parameters, cv=5, scoring='%s_macro' % score)
+    clf.fit(X_train, y_train)
 
-    for score in scores:
-      print("# Tuning hyper-parameters for %s" % score)
-      print()
-
-#      clf = GridSearchCV(SGDClassifier(shuffle=True, fit_intercept=False, n_jobs=-1, learning_rate="optimal", penalty="l2", class_weight="balanced",n_iter=5), tuned_parameters, cv=5,
-#                       scoring='%s_macro' % score)
-#      clf.fit(X_train, y_train)
-
-      print("Best parameters set found on development set:")
-      print()
-      print(clf.best_params_)
-      print()
-      print("Grid scores on development set:")
-      print()
-      means = clf.cv_results_['mean_test_score']
-      stds = clf.cv_results_['std_test_score']
-      for mean, std, params in zip(means, stds, clf.cv_results_['params']):
-        print("%0.3f (+/-%0.03f) for %r"
-              % (mean, std * 2, params))
+    print("Best parameters set found on development set:")
+    print()
+    print(clf.best_params_)
+    print()
+    print("Grid scores on development set:")
+    print()
+    means = clf.cv_results_['mean_test_score']
+    stds = clf.cv_results_['std_test_score']
+    for mean, std, params in zip(means, stds, clf.cv_results_['params']):
+      print("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
       print()
 
       print("Detailed classification report:")
@@ -338,5 +319,55 @@ if __name__ == '__main__':
       y_true, y_pred = y_test, clf.predict(X_test)
       print(classification_report(y_true, y_pred))
       print()
+  
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(description='Train vehicle detection')
+  parser.add_argument('task', type=str,
+   help='task to execute. (trainList1,trainList2,trainList3,gridSearch,best)')
+  args = parser.parse_args()
+  task = args.task
+
+  if task == 'displaySample':
+    displayDatabaseSample()
+
+  elif task == 'trainList1':
+    #read a sample
+    (cars,notcars) = readDatabase(True)
+    #train a list of params for optimization
+    trainParamlist(cars,notcars,getParamlist1())
+
+  elif task == 'trainList2':
+    #read a sample
+    (cars,notcars) = readDatabase(True)
+    #train a list of params for optimization
+    trainParamlist(cars,notcars,getParamlist2())
+
+  elif task == 'trainList3':
+    #read a sample
+    (cars,notcars) = readDatabase(True)
+    #train a list of params for optimization
+    trainParamlist(cars,notcars,getParamlist3())
+
+  elif task == 'best':
+    #read all
+    (cars,notcars) = readDatabase(False)
+    #train the best choice
+    param = ("YCrCb","0,1",True,False,True,3)
+    (X_scaler,svc,acccuracy) = train(param,cars,notcars)
+
+    #save the calibration in a pickle file
+    data = {}
+    data["X_scaler"] = X_scaler
+    data["svc"] = svc
+    data["param"] = param
+    with open(SVC_PATH, 'wb') as f:
+      pickle.dump(data, file=f)    
+    
+  elif task == 'gridSearch':
+    #read a sample
+    (cars,notcars) = readDatabase(True)
+    #find optimal Classifier parameter
+    param = ("YCrCb","0,1",True,False,True,3)
+    gridSearch(cars,notcars,param)
 
       
