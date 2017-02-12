@@ -19,8 +19,6 @@ The goals / steps of this project are the following:
 [image7]: ./output_images/static_results.png
 [video1]: ./project_result.mp4
 [video2]: ./project_debug_result.mp4
-[youtubevideo1]: https://youtu.be/rZWEOtvjJAE
-[youtubevideo2]: https://youtu.be/3Eqp3ArygbA
 
 ---
 ###Histogram of Oriented Gradients (HOG)
@@ -252,7 +250,12 @@ I decided therefore not to use this kind of optimization.
 ####1. Link to the final video output. 
 Here is my result of the vehicle detection:
 
-![result video][video1] or ![here at youtube][youtubevideo1]
+![result video][video1] or 
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=rZWEOtvjJAE
+" target="_blank"><img src="http://img.youtube.com/vi/rZWEOtvjJAE/0.jpg" 
+alt="here at youtube" width="480" height="270" border="10" /></a>
+
 
 ####2. Filter for false positives and combining overlapping bounding boxes.
 The processing is nearly identical to the pipeline described fopr the test images. Main difference is the use of an averaged heat map. The heat values are stored in a list for the 10 recent images. An averaged heat map for these history of images is calculated by the mean calling `heatmap.average()` at line 77 in module `processChain.py`. 
@@ -265,7 +268,11 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 The heat map and the dynamic grid around the detected cars are  shown in a debug video.
 
-![debug video][video2]
+![debug video][video2] or
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=3Eqp3ArygbA
+" target="_blank"><img src="http://img.youtube.com/vi/3Eqp3ArygbA/0.jpg" 
+alt="here at youtube" width="480" height="270" border="10" /></a>
 
 I reduced the rate of false negative detections using the above mentioned `hard negative test` feature and retrained the model. The small static search window grid on the left and right image part reduced the amount of false negatives further. The largest impact had the large overlap of windows in the search area around the known car  positions. This produced a larger amount of detections. Averaging this over the image history leaded to a supression of false detections.
 
