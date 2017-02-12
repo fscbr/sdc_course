@@ -19,6 +19,8 @@ The goals / steps of this project are the following:
 [image7]: ./output_images/static_results.png
 [video1]: ./project_result.mp4
 [video2]: ./project_debug_result.mp4
+[youtubevideo1]: https://youtu.be/rZWEOtvjJAE
+[youtubevideo2]: https://youtu.be/3Eqp3ArygbA
 
 ---
 ###Histogram of Oriented Gradients (HOG)
@@ -250,7 +252,7 @@ I decided therefore not to use this kind of optimization.
 ####1. Link to the final video output. 
 Here is my result of the vehicle detection:
 
-![result video][video1]
+![result video][video1] or ![here at youtube][youtubevideo1]
 
 ####2. Filter for false positives and combining overlapping bounding boxes.
 The processing is nearly identical to the pipeline described fopr the test images. Main difference is the use of an averaged heat map. The heat values are stored in a list for the 10 recent images. An averaged heat map for these history of images is calculated by the mean calling `heatmap.average()` at line 77 in module `processChain.py`. 
