@@ -17,9 +17,6 @@ The goals / steps of this project are the following:
 [image5]: ./output_images/sliding_window_video.jpg
 [image6]: ./output_images/sliding_window_heatmap.jpg
 [image7]: ./output_images/static_results.png
-[image8]: ./output_images/bboxes_and_heat.png
-[image9]: ./output_images/labels_map.png
-[image10]: ./output_images/output_bboxes.png
 [video1]: ./project_result.mp4
 [video2]: ./project_debug_result.mp4
 
@@ -234,6 +231,16 @@ The found optimal parameters are: loss=`squared_hinge`,`penalty=`elasticnet` and
 I decided have large overlay of search windows around the expected car position to improve the signal / error ratio. The more hit are stored in the heat map, the less false detections occure. 
 For sure this costs computation power, but as I kept the search area  small, the performance is still good.
 
+To improve the computation performance of the process chain, I implemented a  method `searchWindowsOptimized()` in the module `featureDetection.py`. It creates only once the hog features for the image and extracts the features for a window by searching for the proper subset. The results have been different than to the calculation of th ehog features for each window as the hog calculation consists out of these steps:
+
+*  (optional) global image normalisation
+*  computing the gradient image in x and y
+*  computing gradient histograms
+*  normalising across blocks
+*  flattening into a feature vector
+
+The `normalising across blocks` leads to different results for the optimized version and the original one.
+
 ![alt text][image7]
 ---
 
@@ -245,27 +252,19 @@ Here is my result of the vehicle detection:
 ![alt text][video1]
 
 ####2. Filter for false positives and combining overlapping bounding boxes.
-The processing is nearly identical to the pipeline described fopr the test images. Main difference is the use of an averaged heat map. The heat values are stored in a list for the 10 recent images. An averaged heat map for these history of images is calculated by the mean calling `heatmap.average()` at line 77. 
+The processing is nearly identical to the pipeline described fopr the test images. Main difference is the use of an averaged heat map. The heat values are stored in a list for the 10 recent images. An averaged heat map for these history of images is calculated by the mean calling `heatmap.average()` at line 77 in module `processChain.py`. 
 
-Additionally the movement of a box representing a vehicle is retrieved by subtracting from the last detected position at line 69 through 74 in module `heatmap.py`. I use this to fore cast the car position in the next image.
+Additionally the movement of a box representing a vehicle is retrieved by subtracting from the last detected position at line 72 through 77 in module `heatmap.py`. I use this to forecast the car position in the next image.
+
+The history of found car positions is stored in the list `cars` in the clas Heatmap. The actual positions are merged with the previous found calling the method `mergeCars()`. A lost car position is kept in a dictionary `lostCars`. If it has not been found again within 10 images, it is dropped.
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
-The heat map and the dynamic grid around the detected cars is shown in a debug video
+The heat map and the dynamic grid around the detected cars are  shown in a debug video.
 
 ![alt text][video2]
 
-### Here are six frames and their corresponding heatmaps:
-
-![alt text][image5]
-
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
-
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
-
-
+I reduced the rate of false negative detections using the above mentioned `hard negative test` feature and retrained the model. The small static search window grid on the left and right image part reduced the amount of false negatives further. The largest impact had the large overlap of windows in the search area around the known car  positions. This produced a larger amount of detections. Averaging this over teh image history leaded to a supression of false detections.
 
 ---
 
