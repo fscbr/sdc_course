@@ -28,7 +28,7 @@ The goals / steps of this project are the following:
 The code for this step is in module `trainSvm.py` function `readDatabase()` at line 81 through 107. 
 If `reducedSamples` parameter is `True`, only a randomized subset of 2000 samples is loaded and returned.
 
-As database for the training I used the a combination of the GTI vehicle image database, the KITTI vision benchmark suite, and examples extracted from the project video itself offered on the project repository.
+As database for the training, I used the a combination of the GTI vehicle image database, the KITTI vision benchmark suite, and examples extracted from the project video itself offered on the project repository.
 
 The database contains 8792 vehicles and 8968 non-vehicles.
 
@@ -44,7 +44,7 @@ Here is an example using the `RGB` color space and HOG parameters of `orientatio
 
 ####2. How to settle the final choice of HOG parameters
 
-In module `trainSvm.py` I created a function `trainParamlist()` (line 191 through 214) that loops over a list of parameter combinations. It uses the above described randomized subset of the database and displays the accuracy on the trained model.
+In module `trainSvm.py`, I created a function `trainParamlist()` (line 191 through 214) that loops over a list of parameter combinations. It uses the above described randomized subset of the database and displays the accuracy on the trained model.
 
 To execute the parameter search you call `python trainSvm.py task trainList1`.
 
@@ -100,12 +100,12 @@ The results for the different combinations are shown in the table below:
 | YCrCb | ALL | False | True | False | 0.4812 |
 | YCrCb | ALL | True | False | False | 0.965 |
 
-I found best result for RGB, HLS; HSV and YCrCb color space, histogram feature did not have a large impact.
+I found best result for RGB, HLS, HSV and YCrCb color space, histogram feature did not have a large impact.
  
 In a second round I trained the best color spaces for combinations of their color channels using hog only. 
 To execute this call `python trainSvm.py task trainList2`.
 
-Only YCrCb showed a better result, when reducing the color channels.
+YUV and YCrCb showed better results, when reducing the color channels.
 
 |Color space|Channels| Spatial | Histogram | HOG | Accuracy |
 |:---------:|:------:|:-------:|:---------:|:---:|:--------:| 
@@ -124,8 +124,8 @@ Only YCrCb showed a better result, when reducing the color channels.
 | YCrCb | 0,2 | False | False | True | **0.9875** |
 | YCrCb | 1,2 | False | False | True | 0.9475 |
 
-LUV was not able to train because of NaN values in the scaler that caused exceptions. I did not look into that as I got high accuracies on other parmeters
-YUV color channel 0 and 2 resulted in a high accuracy which offers a smaller feature size and faster processing.
+LUV was not able to be trained because of NaN values in the scaler, that caused exceptions. I did not look into that as I got high accuracies on other parmeters.
+YUV color channel 0 and 2 resulted in a high accuracy, which offers a smaller feature size and faster processing.
 The same applied for YCrCb color channel 0 and 1
 In the last round I trained these other feature combinations.
 To execute this call `python trainSvm.py task trainList3`.
@@ -152,7 +152,7 @@ To execute this call `python trainSvm.py task trainList3`.
 | YCrCb | 0,1 | True | False | False | 0.9588 |
 | YCrCb | 0,1 | False | False | False | 0 |
 
-Interestingly the results vary always a bit even when defining a random seed. I chosed YCrCb and 0,1 color channel spatial and hog features. Its has a little smaller feature size, but and accuracy of 99.38%. The feature vector has a length of 6600. The accuracy for the choosen parameters is 0.9867 for all images.
+Interestingly the results vary always a bit even when defining a random seed. I chosed YCrCb and 0,1 color channel spatial and hog features. It has a little smaller feature size, but and accuracy of 99.38%. The feature vector has a length of 6600. The accuracy for the choosen parameters is 0.9867 for all images.
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
@@ -250,7 +250,7 @@ I decided therefore not to use this kind of optimization.
 ####1. Link to the final video output. 
 Here is my result of the vehicle detection:
 
-![alt text][video1]
+![result video][video1]
 
 ####2. Filter for false positives and combining overlapping bounding boxes.
 The processing is nearly identical to the pipeline described fopr the test images. Main difference is the use of an averaged heat map. The heat values are stored in a list for the 10 recent images. An averaged heat map for these history of images is calculated by the mean calling `heatmap.average()` at line 77 in module `processChain.py`. 
@@ -263,7 +263,7 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 The heat map and the dynamic grid around the detected cars are  shown in a debug video.
 
-![alt text][video2]
+![debug video][video2]
 
 I reduced the rate of false negative detections using the above mentioned `hard negative test` feature and retrained the model. The small static search window grid on the left and right image part reduced the amount of false negatives further. The largest impact had the large overlap of windows in the search area around the known car  positions. This produced a larger amount of detections. Averaging this over the image history leaded to a supression of false detections.
 
