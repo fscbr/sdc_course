@@ -44,7 +44,7 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
   if smooth:
     windows += heatmap.getSearchAreas(normImage)
     if debug:
-      result = fd.drawBoxes(result, windows, color=(255,255,255), thick=(1))  
+      debugImg = fd.drawBoxes(debugImg, windows, color=(255,255,255), thick=(1))  
   else:
 #static mode for test images  
     heatmap = hm.Heatmap(1)
@@ -55,7 +55,6 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
   pix_per_cell = 8 # HOG pixels per cell
   spatial_size = (16, 16) # Spatial binning dimensions
   hist_bins = 16    # Number of histogram bins
-
 # classify the image parts in the search windows
   hot_windows = fd.searchWindows(normImage, windows, svc, X_scaler, color_space=color_space, 
                       spatial_size=spatial_size, hist_bins=hist_bins, 
@@ -66,7 +65,7 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
 
   if debug:
 #draw the search window grid for debugging                    
-    result = fd.drawBoxes(result, windows, color=(0,255,255), thick=(2))  
+    debugImg = fd.drawBoxes(debugImg, windows, color=(0,255,255), thick=(2))  
 #draw the windows that got a match for debugging                      
     debugImg = fd.drawBoxes(debugImg, hot_windows, color=(0, 0, 255), thick=1)                    
 
@@ -77,7 +76,7 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
 #average the heatmap over the history of updates  
     heatmap.average()
     heatmap.calcBoxes(result)
-    result = heatmap.drawLabeledBoxes(result,(0,255,0),True)
+    result = heatmap.drawLabeledBoxes(result,(0,255,0),False)
     if debug:
       debugImg = heatmap.drawLabeledBoxes(debugImg,(0,255,0),True)
   else:
@@ -91,26 +90,24 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
       path_to_image = os.path.join("output_images","{0}_{1}.jpg".format(imageName,"debug"))
       scipy.misc.imsave(path_to_image, debugImg)    
     
-  return result
+  if debug:
+    return debugImg
+  else:
+    return result
 
 #define search parameter for window search.
 def getSearchParam(isSmooth):
   if isSmooth:
     search_param = ((64,390,498,224,1050,0.66),
-     (96,390,534,38,278,0.5),
-     (96,390,534,1002,1242,0.5),
-     (160,444,659,10,279,0.66),
-     (160,444,659,1002,1271,0.66),
-     (192,430,622,10,333,0.66),
-     (192,430,622,948,1271,0.66))  
+     (96,390,582,38,278,0.5),
+     (96,390,582,1022,1262,0.5),
+     (128,390,582,24,280,0.5),
+     (128,390,582,1006,1262,0.5))
   else:
     search_param = ((64,390,650,20,1260,0.66),
       (96,390,552,21,1260,0.66),
       (128,390,606,10,1270,0.66))  
   return search_param
-
-
-
       
 if __name__ == '__main__':
 

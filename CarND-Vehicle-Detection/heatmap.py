@@ -10,6 +10,7 @@ class Heatmap():
   def __init__(self,threshold):
     self.recent_maps = []
     self.cars = []
+    self.lostCars = {}
     self.forecast = []
     self.map = None
     self.threshold = threshold
@@ -31,6 +32,7 @@ class Heatmap():
   def average(self):
     if len(self.recent_maps) > 1:
       maps = np.array(self.recent_maps)
+#      self.map = np.sum(maps,axis=0)
       self.map = np.mean(maps,axis=0)
     
   #answer the averaged heat map
@@ -64,17 +66,18 @@ class Heatmap():
         width =  int(max(96,xmax - xmin)/2)
         height =  int(max(96,ymax - ymin)/2)
         
-        cars.append((xc,yc,width,height))
+        xy = (xc,yc,width,height)
+        cars.append(xy)
         
-        mxy = self.getMovement((xc,yc))
+        mxy = self.getMovement(xy)
         (mx,my) = mxy
         
 #        print(xc,yc,"->",mx,my)     
-        #forecast the nesxt postion
+        #forecast the next postion
         self.forecast.append((xc+mx,yc+my))
 
-    #save car positions     
-    self.cars = cars
+    #merge car positions     
+    self.mergeCars(cars)
     
   #draw the heatmap boxes and the heatmap if requested
   def drawLabeledBoxes(self,img,color,drawHeatImage):
@@ -88,7 +91,7 @@ class Heatmap():
         cv2.rectangle(img, bbox[0], bbox[1], color, 6)
     # Return the image
     if drawHeatImage:
-      heatImage = cv2.cvtColor(np.array(self.map*100).astype(np.uint8), cv2.COLOR_GRAY2RGB)
+      heatImage = cv2.cvtColor(np.array(self.map*10).astype(np.uint8), cv2.COLOR_GRAY2RGB)
       heatImage[:,:,1]=0
       heatImage[:,:,2]=0
       img = cv2.addWeighted(img, 1, heatImage, 0.5, 0)
@@ -127,17 +130,47 @@ class Heatmap():
 
   #answer movement vector if a vector close to the parameter has been found     
   def getMovement(self,xy):
-    (xc,yc) = xy
-    distance = 99
-    bestxy = None
-    for hxy in self.cars:
-      (hxc,hyc,width,height) = hxy
-      if (xc-hxc)*(xc-hxc) + (yc-hyc)*(yc-hyc) < distance:
-        bestxy = hxy
+    (xc,yc,width,height) = xy
+
+    bestxy = self.getClosestPosition(xy)
       
     if not bestxy is None:
       (hxc,hyc,width,height) = bestxy 
 #      print("movement: ",xc-hxc,yc-hyc)
       return (xc-hxc,yc-hyc)
     return (0,0)
-    
+
+  #merge the old and the new car position list to avoid detection losses from one to the other image
+  # not found cars are ignored after 10 images
+  def mergeCars(self,cars):
+    old_cars = self.cars
+    self.cars = cars
+    for xy in old_cars:
+      if self.getClosestPosition(xy) is None:
+        counter = self.lostCars.get(xy,None)
+        if counter is None:
+          self.lostCars[xy] = 1
+        elif counter < 10: 
+          self.lostCars[xy] = counter+1
+        else:
+          del self.lostCars[xy]
+
+  #find the closest position in the car list related to a position. Return None if no close position is found.
+  def getClosestPosition(self, xy):
+    (xc,yc,width,height) = xy
+    bestdistance = 999
+    bestxy = None
+    for hxy in self.cars:
+      (hxc,hyc,hwidth,hheight) = hxy
+      distance = (xc-hxc)*(xc-hxc) + (yc-hyc)*(yc-hyc)
+
+      if distance < bestdistance:
+        bestxy = hxy
+        bestdistance = distance
+      
+    if not bestxy is None:
+      (hxc,hyc,width,height) = bestxy 
+      return (bestxy)
+#    print("not found: ",xy,bestdistance)
+    return None
+

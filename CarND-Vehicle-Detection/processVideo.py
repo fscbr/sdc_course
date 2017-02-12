@@ -10,7 +10,7 @@ import time
 import globalData as gd
 
 def processImage(image):
-  return pc.processColoredImage(image,True,True,None,X_scaler,svc,param)
+  return pc.processColoredImage(image,True,False,None,X_scaler,svc,param)
     
 #load trained model
 data = {}
@@ -22,7 +22,7 @@ param = data["param"]
 
 #init global data
 gd.data["image_counter"]=0
-gd.data["heatmap"]=hm.Heatmap(0)
+gd.data["heatmap"]=hm.Heatmap(1)
 
 #process video
 white_output = 'project_result.mp4'
