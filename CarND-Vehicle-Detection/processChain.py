@@ -62,7 +62,6 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
                       cell_per_block=cell_per_block, 
                       hog_channel=hog_channel, spatial_feat=spatial_feat, 
                       hist_feat=hist_feat, hog_feat=hog_feat,hardNegative=False)                       
-
   if debug:
 #draw the search window grid for debugging                    
     debugImg = fd.drawBoxes(debugImg, windows, color=(0,255,255), thick=(2))  
@@ -98,7 +97,7 @@ def processColoredImage(image,smooth,debug,imageName,X_scaler,svc,param):
 #define search parameter for window search.
 def getSearchParam(isSmooth):
   if isSmooth:
-    search_param = ((64,390,498,224,1050,0.66),
+    search_param = ((64,390,476,224,1050,0.66),
      (96,390,582,38,278,0.5),
      (96,390,582,1022,1262,0.5),
      (128,390,582,24,280,0.5),

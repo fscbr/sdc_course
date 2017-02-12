@@ -231,7 +231,7 @@ The found optimal parameters are: loss=`squared_hinge`,`penalty=`elasticnet` and
 I decided have large overlay of search windows around the expected car position to improve the signal / error ratio. The more hit are stored in the heat map, the less false detections occure. 
 For sure this costs computation power, but as I kept the search area  small, the performance is still good.
 
-To improve the computation performance of the process chain, I implemented a  method `searchWindowsOptimized()` in the module `featureDetection.py`. It creates only once the hog features for the image and extracts the features for a window by searching for the proper subset. The results have been different than to the calculation of th ehog features for each window as the hog calculation consists out of these steps:
+To improve the computation performance of the process chain, I implemented a  method `searchWindowsOptimized()` in the module `featureDetection.py`. It creates only once the hog features for the image and extracts the features for a window by searching for the proper subset. The results have been different then to the calculation of the hog features for each window, as the hog calculation consists out of these steps:
 
 *  (optional) global image normalisation
 *  computing the gradient image in x and y
@@ -240,6 +240,7 @@ To improve the computation performance of the process chain, I implemented a  me
 *  flattening into a feature vector
 
 The `normalising across blocks` leads to different results for the optimized version and the original one.
+I decided therefore not to use this kind of optimization.
 
 ![alt text][image7]
 ---
@@ -264,13 +265,22 @@ The heat map and the dynamic grid around the detected cars are  shown in a debug
 
 ![alt text][video2]
 
-I reduced the rate of false negative detections using the above mentioned `hard negative test` feature and retrained the model. The small static search window grid on the left and right image part reduced the amount of false negatives further. The largest impact had the large overlap of windows in the search area around the known car  positions. This produced a larger amount of detections. Averaging this over teh image history leaded to a supression of false detections.
+I reduced the rate of false negative detections using the above mentioned `hard negative test` feature and retrained the model. The small static search window grid on the left and right image part reduced the amount of false negatives further. The largest impact had the large overlap of windows in the search area around the known car  positions. This produced a larger amount of detections. Averaging this over the image history leaded to a supression of false detections.
 
 ---
 
 ###Discussion
 
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+####1. Problems / issues faced in the implementation of the project.  Where will the pipeline likely fail?  What could I do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+I recognized some areas, where the choosen approach might not be sufficient:
+
+* Performance: The more vehicles are detected, the more search windows are to be processed. A more sophicticated algorithm should be found to melt search windows which are close. This could reduce the amount of windows to be processed. The optimized windows search function, I mentioned above could be improved to calculate hog features only for a set of overlapping windows and extract the features for the individual ones. In my current implementation roughly the hog features processing cost about the same computation time like the prediction of the classifier. An optimized search window method caching the hog features would improve a lot. 
+
+* Vecicle shape: The database does not cover all shapes of vehicles like trucks and buses. It should be extended.
+
+* Environment: The database contains images that seemded to be in a normal good illumination conditions. Different illumination (dawn, bad wheather, night) will result in a bad detection rate. To overcome this, databases covering a larger set of environmental conditions needed to be trained.
+
+* Overlapping Vehicles: If vehicles overlap like in the video, my solution is not able to seperate the vehicles properly. Either they are covered by one box, either only one vehicle is tracked, but the vehicle behind the closer one is surpressed. The Heatmap class should be improved to handle this better.
+
 
