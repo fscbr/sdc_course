@@ -26,7 +26,7 @@ The goals / steps of this project are the following:
 
 ###Camera Calibration
 
-####1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
+####1. How I computed the camera matrix and distortion coefficients
 
 The code for this step is contained in the module file `calibration.py`. 
 
@@ -48,14 +48,15 @@ One distortion corrected camera test image is shown below:
 
 ###Pipeline (single images)
 The pipeline is executed in the module `lineDetection.py` function `process_colored_image()`.
-####1. Provide an example of a distortion-corrected image.
+
+####1. Distortion-correction of images
 In the main function of module `lineDetection.py` the camera matrix, distortion coefficients and the used image shape are loaded. If required the test image is resized to this predefined shape.
 
 In Line 106 again the image is distortion corrected calling  `cv2.undistort()`.
 
 ![alt text][image2]
 
-####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
+####2. Used color transforms, gradients and other methods to create a thresholded binary image
 I used a combination of different color channels and thresholds to generate a binary image at line 112 in module `lineDetection.py` calling `binaryFromColorspaces()` in the module `imageProcessing.py`. 
 
 Function `binaryFromColorspaces()` line 70 to line 77 blurs (kernel size 15) the images to reduce clutter and receives a binary mask from function `binaryFromRGB()` and another binary mask from function `binaryFromYUVGray()` in the same file. Both mask are overlayed using an **or** operator.
@@ -72,7 +73,7 @@ Here's an example of my output for this step.
 
 I experimented as well using magnitude and direction gradient functions, but they did not improve the results. I found better results, concentrating on the approbiate color spaces and dynamic thresholds.
 
-####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+####3. How I performed a perspective transform
 
 The code in module `transformPerspective.py` includes a function `transformPerspective()`in lines 12 through 14. It is called at line 110 in `lineDetection.py` and expects the transformation matrix M.
 
@@ -102,7 +103,7 @@ I decided to transform the perspective, before I build the binary mask. The resu
 
 ![alt text][image7]
 
-####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+####4. How I identified lane-line pixels and fit their positions with a polynomial
 
 Lines are extracted in the module `line.py`. Entry function is `findLine()` from line 69 through 94.
 The following steps are applied:
@@ -119,7 +120,7 @@ On the right line blue again are peak, green are spline points.
 
 ![alt text][image8]
 
-####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+####5. Calculation of the radius of curvature of the lane and the position of the vehicle with respect to center.
 
 For the radius of curvature I decided to create a center line as an average between the smoothed left and right line.
 I did this in lines 76 through 85 in `lineDetection.py`. 
@@ -130,7 +131,7 @@ second order polyline. Finally I calculated the radius using the well known form
 
 The relative position of the vehicle is calculated in function `calcOffset` in the module `line.py` lines 45 through 47. The difference between the image x center value and the x coordinate on the image bottom is multiplied by the scaling factor. The function is applied for the center line at line 84 in the module `lineDetection.py`.
 
-####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+####6. Example image of the result plotted back down onto the road showing the lane area
 
 I implemented this step in lines 13 through 33 in my code in `lineDetection.py` in the function `drawLinesOnRoad()`.  Here is an example of my result on a test image:
 
@@ -140,15 +141,16 @@ I implemented this step in lines 13 through 33 in my code in `lineDetection.py` 
 
 ###Pipeline (video)
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
+Here's a [link to my video result](./project_result.mp4) 
 
-Here's a [link to my video result](./project_result.mp4)
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=ZelmqqB70Oo
+" target="_blank"><img src="http://img.youtube.com/vi/ZelmqqB70Oo/0.jpg" 
+alt="here at youtube" width="480" height="270" border="10" /></a>
+
 
 ---
 
 ###Discussion
-
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 As in the first project the main weekness is the sensitivity on the brightness of images and local shades from trees. This has improved in this project already. But there is still space to improve. 
 If the binary mask are bad, there will be only few peaks found to determine a line. To get a solid polynom fit, correct line points are especially  needed in the upper area of the image. To improve that I would try to create the binary mask using local thresholds in the images. This should be more able to handle shades.
