@@ -1,36 +1,7 @@
 
 # **Finding Lane Lines on the Road** 
 ***
-In this project, you will use the tools you learned about in the lesson to identify lane lines on the road.  You can develop your pipeline on a series of individual images, and later apply the result to a video stream (really just a series of images). Check out the video clip "raw-lines-example.mp4" (also contained in this repository) to see what the output should look like after using the helper functions below. 
-
-Once you have a result that looks roughly like "raw-lines-example.mp4", you'll need to get creative and try to average and/or extrapolate the line segments you've detected to map out the full extent of the lane lines.  You can see an example of the result you're going for in the video "P1_example.mp4".  Ultimately, you would like to draw just one line for the left side of the lane, and one for the right.
-
----
-Let's have a look at our first image called 'test_images/solidWhiteRight.jpg'.  Run the 2 cells below (hit Shift-Enter or the "play" button above) to display the image.
-
-**Note** If, at any point, you encounter frozen display windows or other confounding issues, you can always start again with a clean slate by going to the "Kernel" menu above and selecting "Restart & Clear Output".
-
----
-
-**The tools you have are color selection, region of interest selection, grayscaling, Gaussian smoothing, Canny Edge Detection and Hough Tranform line detection.  You  are also free to explore and try other techniques that were not presented in the lesson.  Your goal is piece together a pipeline to detect the line segments in the image, then average/extrapolate them and draw them onto the image for display (as below).  Once you have a working pipeline, try it out on the video stream below.**
-
----
-
-<figure>
- <img src="line-segments-example.jpg" width="380" alt="Combined Image" />
- <figcaption>
- <p></p> 
- <p style="text-align: center;"> Your output should look something like this (above) after detecting line segments using the helper functions below </p> 
- </figcaption>
-</figure>
- <p></p> 
-<figure>
- <img src="laneLines_thirdPass.jpg" width="380" alt="Combined Image" />
- <figcaption>
- <p></p> 
- <p style="text-align: center;"> Your goal is to connect/average/extrapolate line segments to get output like this</p> 
- </figcaption>
-</figure>
+In this project, I used the cv2 tools to identify lane lines on the road.  I developed a pipeline on a series of individual images, and later applied the result to a video stream. 
 
 
 ```python
@@ -65,7 +36,7 @@ plt.imshow(image)  #call as plt.imshow(gray, cmap='gray') to show a grayscaled i
 ![png](P1_sdc_v3_files/P1_sdc_v3_3_2.png)
 
 
-**Some OpenCV functions (beyond those introduced in the lesson) that might be useful for this project are:**
+**Some OpenCV functions that have been useful for this project are:**
 
 `cv2.inRange()` for color selection  
 `cv2.fillPoly()` for regions selection  
@@ -75,9 +46,7 @@ plt.imshow(image)  #call as plt.imshow(gray, cmap='gray') to show a grayscaled i
 `cv2.imwrite()` to output images to file  
 `cv2.bitwise_and()` to apply a mask to an image
 
-**Check out the OpenCV documentation to learn about these and discover even more awesome functionality!**
-
-Below are some helper functions to help get you started. They should look familiar from the lesson!
+Below are some helper functions I needed to get started.
 
 
 ```python
@@ -186,8 +155,7 @@ def color_select(image,threshold_r,threshold_g,threshold_b):
 
 ## Test on Images
 
-Now you should build your pipeline to work on the images in the directory "test_images"  
-**You should make sure your pipeline works well on these images before you try the videos.**
+Now define functions that I need in the pipeline to process the images
 
 
 ```python
@@ -553,8 +521,6 @@ for item in os.listdir("test_images/"):
   
 
 ```
-
-    ['solidWhiteCurve.jpg', 'solidWhiteRight.jpg', 'solidYellowCurve2.jpg', 'solidYellowCurve.jpg', 'solidYellowLeft.jpg', 'whiteCarLaneSwitch.jpg']
     solidWhiteCurve.jpg
 
 
@@ -597,18 +563,7 @@ for item in os.listdir("test_images/"):
 ![png](P1_sdc_v3_files/P1_sdc_v3_9_11.png)
 
 
-run your solution on all test_images and make copies into the test_images directory).
-
-## Test on Videos
-
-You know what's cooler than drawing lanes over images? Drawing lanes over video!
-
-We can test our solution on two provided videos:
-
-`solidWhiteRight.mp4`
-
-`solidYellowLeft.mp4`
-
+to run the solution on videos this code has to be executed:
 
 ```python
 # Import everything needed to edit/save/watch video clips
@@ -640,116 +595,8 @@ white_clip = clip1.fl_image(process_image) #NOTE: this function expects color im
 
 ```
 
-    [MoviePy] >>>> Building video white.mp4
-    [MoviePy] Writing video white.mp4
-
-
-    100%|█████████▉| 221/222 [00:07<00:00, 31.35it/s]
-
-
-    [MoviePy] Done.
-    [MoviePy] >>>> Video ready: white.mp4 
-    
-    CPU times: user 16.5 s, sys: 120 ms, total: 16.6 s
-    Wall time: 7.46 s
-
-
-Play the video inline, or if you prefer find the video in your filesystem (should be in the same directory) and play it in your video player of choice.
-
-
-```python
-HTML("""
-<video width="960" height="540" controls>
-  <source src="{0}">
-</video>
-""".format(white_output))
-```
-
-
-
-
-
-<video width="960" height="540" controls>
-  <source src="white.mp4">
-</video>
-
-
-
-
-**At this point, if you were successful you probably have the Hough line segments drawn onto the road, but what about identifying the full extent of the lane and marking it clearly as in the example video (P1_example.mp4)?  Think about defining a line to run the full length of the visible lane based on the line segments you identified with the Hough Transform.  Modify your draw_lines function accordingly and try re-running your pipeline.**
-
-Now for the one with the solid yellow lane on the left. This one's more tricky!
-
-
-```python
-HTML("""
-<video width="960" height="540" controls>
-  <source src="{0}">
-</video>
-""".format("P1_example.mp4"))
-```
-
-
-
-
-
-<video width="960" height="540" controls>
-  <source src="P1_example.mp4">
-</video>
-
-
-
-
-
-```python
-lhistory = []
-rhistory = []
-yellow_output = 'yellow.mp4'
-clip2 = VideoFileClip('solidYellowLeft.mp4')
-yellow_clip = clip2.fl_image(process_image)
-%time yellow_clip.write_videofile(yellow_output, audio=False)
-
-```
-
-    [MoviePy] >>>> Building video yellow.mp4
-    [MoviePy] Writing video yellow.mp4
-
-
-    100%|█████████▉| 681/682 [00:21<00:00, 31.20it/s]
-
-
-    [MoviePy] Done.
-    [MoviePy] >>>> Video ready: yellow.mp4 
-    
-    CPU times: user 51 s, sys: 340 ms, total: 51.4 s
-    Wall time: 22.3 s
-
-
-
-```python
-HTML("""
-<video width="960" height="540" controls>
-  <source src="{0}">
-</video>
-""".format(yellow_output))
-```
-
-
-
-
-
-<video width="960" height="540" controls>
-  <source src="yellow.mp4">
-</video>
-
-
-
 
 ## Reflections
-
-Congratulations on finding the lane lines!  As the final step in this project, we would like you to share your thoughts on your lane finding pipeline... specifically, how could you imagine making your algorithm better / more robust?  Where will your current algorithm be likely to fail?
-
-Please add your thoughts below,  and if you're up for making your pipeline more robust, be sure to scroll down and check out the optional challenge video below!
 
 
 There are three major weaknesses of the current implementation:
@@ -787,93 +634,3 @@ results are now much more stable.
   
 
 
-```python
-
-```
-
-## Submission
-
-If you're satisfied with your video outputs it's time to submit!  Submit this ipython notebook for review.
-
-
-## Optional Challenge
-
-Try your lane finding pipeline on the video below.  Does it still work?  Can you figure out a way to make it more robust?  If you're up for the challenge, modify your pipeline so it works with this video and submit it along with the rest of your project!
-
-
-```python
-lhistory = []
-rhistory = []
-challenge_output = 'extra.mp4'
-clip2 = VideoFileClip('challenge.mp4')
-challenge_clip = clip2.fl_image(process_image)
-%time challenge_clip.write_videofile(challenge_output, audio=False)
-```
-
-    [MoviePy] >>>> Building video extra.mp4
-    [MoviePy] Writing video extra.mp4
-
-
-     60%|██████    | 151/251 [00:08<00:07, 13.36it/s]
-
-    stored image: notTwoLines1
-
-
-     63%|██████▎   | 157/251 [00:09<00:07, 12.08it/s]
-
-    stored image: notTwoLines2
-
-
-     64%|██████▍   | 161/251 [00:09<00:07, 11.99it/s]
-
-    stored image: notTwoLines3
-
-
-    100%|██████████| 251/251 [00:15<00:00, 16.71it/s]
-
-
-    [MoviePy] Done.
-    [MoviePy] >>>> Video ready: extra.mp4 
-    
-    CPU times: user 24.5 s, sys: 2.24 s, total: 26.8 s
-    Wall time: 15.8 s
-
-
-
-![png](P1_sdc_v3_files/P1_sdc_v3_28_9.png)
-
-
-
-```python
-HTML("""
-<video width="960" height="540" controls>
-  <source src="{0}">
-</video>
-""".format(challenge_output))
-```
-
-
-
-
-
-<video width="960" height="540" controls>
-  <source src="extra.mp4">
-</video>
-
-
-
-
-
-```python
-
-```
-
-
-```python
-
-```
-
-
-```python
-
-```
