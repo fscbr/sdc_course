@@ -1,7 +1,12 @@
-# Extended Kalman Filter Project Starter Code
+# Extended Kalman Filter Project
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+
+[//]: # (Image References)
+
+[image1]: .ekf-data1.png "result plot data1"
+[image2]: .ekf-data2.png "result plot data1"
 
 ## Dependencies
 
@@ -18,35 +23,34 @@ Self-Driving Car Engineer Nanodegree Program
    some sample inputs in 'data/'.
     - eg. `./ExtendedKF ../data/sample-laser-radar-measurement-data-1.txt output.txt`
 
-## Editor Settings
+## Measurement Covariance
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+For the Laser source measuring x,y position, I choosed:
+|x|y|
+|0.00684|0|
+|0|0.005489|
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+For the Rader source measuring range, bearing, range rate, I choosed:
 
-## Code Style
+|r|b|rd|
+|0.0144|0|0|
+|0|0.000001|0|
+|0|0|0.011|
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+## Results
 
-## Generating Additional Data
+For the two data files I got these Accuracy - RMSE:
 
-This is optional!
+|data1|data2|
+|0.0337424|0.17585|
+|0.0275774|0.167605|
+|0.458483|0.384221|
+|0.44524|0.538389|
 
-If you'd like to generate your own radar and lidar data, see the
-[utilities repo](https://github.com/udacity/CarND-Mercedes-SF-Utilities) for
-Matlab scripts that can generate additional data.
+Data 1 result image:
+![alt text][image1]
 
-## Project Instructions and Rubric
+Data 2 result image:
+![alt text][image2]
 
-This information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/12dd29d8-2755-4b1b-8e03-e8f16796bea8)
-for instructions and the project rubric.
-
-## Hints!
-
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
 
