@@ -61,13 +61,18 @@ int main(int argc, char* argv[]) {
 
   check_files(in_file_, in_file_name_, out_file_, out_file_name_);
 
-  vector<MeasurementPackage> measurement_pack_list;
-  vector<GroundTruthPackage> gt_pack_list;
-
   string line;
+
+  // Create a Fusion EKF instance
+  FusionEKF fusionEKF;
+  // used to compute the RMSE later
+  vector<VectorXd> estimations;
+  vector<VectorXd> ground_truth;
 
   // prep the measurement packages (each line represents a measurement at a
   // timestamp)
+  // ekf processing
+  // write to output file
   while (getline(in_file_, line)) {
 
     string sensor_type;
@@ -89,9 +94,6 @@ int main(int argc, char* argv[]) {
       iss >> x;
       iss >> y;
       meas_package.raw_measurements_ << x, y;
-      iss >> timestamp;
-      meas_package.timestamp_ = timestamp;
-      measurement_pack_list.push_back(meas_package);
     } else if (sensor_type.compare("R") == 0) {
       // RADAR MEASUREMENT
 
@@ -105,10 +107,9 @@ int main(int argc, char* argv[]) {
       iss >> theta;
       iss >> ro_dot;
       meas_package.raw_measurements_ << ro, theta, ro_dot;
-      iss >> timestamp;
-      meas_package.timestamp_ = timestamp;
-      measurement_pack_list.push_back(meas_package);
     }
+    iss >> timestamp;
+    meas_package.timestamp_ = timestamp;
 
     // read ground truth data to compare later
     float x_gt;
@@ -119,55 +120,42 @@ int main(int argc, char* argv[]) {
     iss >> y_gt;
     iss >> vx_gt;
     iss >> vy_gt;
-    gt_package.gt_values_ = VectorXd(4);
-    gt_package.gt_values_ << x_gt, y_gt, vx_gt, vy_gt;
-    gt_pack_list.push_back(gt_package);
-  }
 
-  // Create a Fusion EKF instance
-  FusionEKF fusionEKF;
+    fusionEKF.ProcessMeasurement(meas_package);
 
-  // used to compute the RMSE later
-  vector<VectorXd> estimations;
-  vector<VectorXd> ground_truth;
-
-  //Call the EKF-based fusion
-  size_t N = measurement_pack_list.size();
-  for (size_t k = 0; k < N; ++k) {
-    //skip laser
-    //    if (measurement_pack_list[k].sensor_type_ == MeasurementPackage::LASER)
-    //  	  continue;
-    // start filtering from the second frame (the speed is unknown in the first
-    // frame)
-    fusionEKF.ProcessMeasurement(measurement_pack_list[k]);
-
+    //output stream to string as a buffer
+    ostringstream out_line;
     // output the estimation
-    out_file_ << fusionEKF.ekf_.x_(0) << "\t";
-    out_file_ << fusionEKF.ekf_.x_(1) << "\t";
-    out_file_ << fusionEKF.ekf_.x_(2) << "\t";
-    out_file_ << fusionEKF.ekf_.x_(3) << "\t";
+    out_line << fusionEKF.ekf_.x_(0) << "\t" << fusionEKF.ekf_.x_(1) << "\t" << fusionEKF.ekf_.x_(2) << "\t" << fusionEKF.ekf_.x_(3) << "\t";
 
     // output the measurements
-    if (measurement_pack_list[k].sensor_type_ == MeasurementPackage::LASER) {
+    if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
       // output the estimation
-      out_file_ << measurement_pack_list[k].raw_measurements_(0) << "\t";
-      out_file_ << measurement_pack_list[k].raw_measurements_(1) << "\t";
-    } else if (measurement_pack_list[k].sensor_type_ == MeasurementPackage::RADAR) {
+    	out_line << meas_package.raw_measurements_(0) << "\t";
+    	out_line << meas_package.raw_measurements_(1) << "\t";
+    } else if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
       // output the estimation in the cartesian coordinates
-      float ro = measurement_pack_list[k].raw_measurements_(0);
-      float phi = measurement_pack_list[k].raw_measurements_(1);
-      out_file_ << ro * cos(phi) << "\t"; // p1_meas
-      out_file_ << ro * sin(phi) << "\t"; // ps_meas
+      float ro = meas_package.raw_measurements_(0);
+      float phi = meas_package.raw_measurements_(1);
+      out_line << ro * cos(phi) << "\t"; // p1_meas
+      out_line << ro * sin(phi) << "\t"; // ps_meas
     }
 
     // output the ground truth packages
-    out_file_ << gt_pack_list[k].gt_values_(0) << "\t";
-    out_file_ << gt_pack_list[k].gt_values_(1) << "\t";
-    out_file_ << gt_pack_list[k].gt_values_(2) << "\t";
-    out_file_ << gt_pack_list[k].gt_values_(3) << "\n";
+    out_line << x_gt << "\t";
+    out_line << y_gt << "\t";
+    out_line << vx_gt << "\t";
+    out_line << vy_gt << "\n";
+
+    out_line.flush();
+    out_file_ << out_line.str();
+
+    VectorXd gt_values = VectorXd(4);
+    gt_values << x_gt, y_gt, vx_gt, vy_gt;
 
     estimations.push_back(fusionEKF.ekf_.x_);
-    ground_truth.push_back(gt_pack_list[k].gt_values_);
+    ground_truth.push_back(gt_values);
+
   }
 
   // compute the accuracy (RMSE)
