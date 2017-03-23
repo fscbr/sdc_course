@@ -129,11 +129,12 @@ VectorXd Tools::CalculateXYFromBearingRange(const MeasurementPackage &measuremen
 	VectorXd x = VectorXd(4);
     float ro = measurement_pack.raw_measurements_(0);
     float phi = measurement_pack.raw_measurements_(1);
+    float rdot = measurement_pack.raw_measurements_(2);
 
 	x[0] = ro * cos( phi );
 	x[1] = ro * sin( phi );
-	x[2] = 0;
-	x[3] = 0;
+	x[2] = rdot * cos( phi );
+	x[3] = rdot * sin( phi );;
 	return x;
 
 }
