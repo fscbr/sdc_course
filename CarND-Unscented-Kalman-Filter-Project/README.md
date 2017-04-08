@@ -36,12 +36,12 @@ For the Rader source measuring range, bearing, range rate, I choosed:
 
 | range  | bearing  | rate  |
 |:------:|:--------:|:-----:|
-| 0.072  | 0        | 0     |
-| 0      | 0.043    | 0     |
-| 0      |0         | 1.05  |
+| 0.0606 | 0        | 0     |
+| 0      | 0.2535   | 0     |
+| 0      |0         | 0.1757|
 
-For the process noise standard deviation longitudinal acceleration I choosed 0.841, 
-for the process noise standard deviation yaw acceleration 0.71
+For the process noise standard deviation longitudinal acceleration I choosed 0.5306, 
+for the process noise standard deviation yaw acceleration 0.6541
 
 ## Results
 
@@ -49,11 +49,10 @@ For the two data files I got these Accuracy - RMSE:
 
 | data1 | data2 |
 |:-----:|:-----:| 
-| 0.0603329| 0.194334|
-| 0.0535377| 0.1929  |
-| 5.61591 | 0.47     |
-| 3.19362| 0.46      |
-| 1.24989| 0.35      |
+| 0.0597718| 0.194016 |
+| 0.0539679| 0.191292 |
+| 0.544135 | 0.355867 |
+| 0.526748 | 0.532885  |
 
 Data 1 result image:
 

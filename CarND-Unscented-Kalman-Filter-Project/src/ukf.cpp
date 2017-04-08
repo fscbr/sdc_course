@@ -1,12 +1,15 @@
 #include <iostream>
 #include "ukf.h"
 #include "tools.h"
+#include "math.h"
 #include "Eigen/Dense"
 
 using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
+#define NIS_LIDAR_THRESHOLD = 5.991
+#define NIS_RADAR_THRESHOLD = 7.815
 /**
  * Initializes Unscented Kalman filter
  */
@@ -39,13 +42,12 @@ void UKF::init()
 	// Process noise standard deviation longitudinal acceleration in m/s^2
 //	std_a_ =  1.531;//radar
 //	std_a_ =  1.531;//lidar
-	std_a_ = 0.841;//both
+	std_a_ = 0.5306;//both
 
 	// Process noise standard deviation yaw acceleration in rad/s^2
 //	std_yawdd_ = 2.27;//radar gem
 //	std_yawdd_ = 2.27;//lidar gem data1
-	std_yawdd_ = 1.3;//both for data1
-	std_yawdd_ = 0.71;//both
+	std_yawdd_ = 0.6541;//both
 
 	// Laser measurement noise standard deviation position1 in m
 	std_laspx_ = 0.05;//
@@ -54,14 +56,14 @@ void UKF::init()
 	std_laspy_ = 0.05;//
 
 	// Radar measurement noise standard deviation radius in m
-	std_radr_ = 0.072;//
+	std_radr_ = 0.0606;//
 
 	// Radar measurement noise standard deviation angle in rad
-	std_radphi_ = 0.043;//
+	std_radphi_ = 0.2535;//
 
 	// Radar measurement noise standard deviation radius change in m/s
-	std_radrd_ = 1.4;//data1
-	std_radrd_ = 1.05;//both
+//	std_radrd_ = 1.4;//data1
+	std_radrd_ = 0.1757;//both
 
 	//set measurement dimension, radar can measure r, phi, and r_dot
 	n_z_r_ = 3;
@@ -107,10 +109,16 @@ void UKF::init()
 	count_r_ = 0;
 }
 
-UKF::UKF(const float std_a,const float std_yawdd ) {
+UKF::UKF(const float std_a,const float std_yawdd ,const float std_radr,const float std_radphi,const float std_radrd) {
 	init();
 	std_a_ = std_a;
 	std_yawdd_ = std_yawdd;
+	std_radr_   = std_radr;
+	std_radphi_ = std_radphi;
+	std_radrd_  = std_radrd;
+
+	R_radar_ << std_radr_ * std_radr_, 0, 0, 0, std_radphi_ * std_radphi_, 0, 0, 0, std_radrd_
+			* std_radrd_;
 }
 
 
@@ -128,8 +136,11 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 	 ****************************************************************************/
 	if (!is_initialized_) {
 		// first measurement
-		cout << "UKF: " << endl;
 		x_ = VectorXd(n_x_);
+		if(x_(0)== 0.0)
+		  x_(0) = 0.0001;
+		if(x_(1)== 0.0)
+		  x_(1) = 0.0001;
 
 		P_.fill(0.0);
 
@@ -221,6 +232,8 @@ void UKF::PredictSigmaPoints(const float delta_t) {
 		double nu_a = Xsig_aug_(5, i);
 		double nu_yawdd = Xsig_aug_(6, i);
 
+		yaw = tools.normalizeAngle(yaw);
+		yawd = tools.normalizeAngle(yawd);
 		//predicted state values
 		double px_p, py_p;
 
@@ -249,7 +262,9 @@ void UKF::PredictSigmaPoints(const float delta_t) {
 		Xsig_pred_(0, i) = px_p;
 		Xsig_pred_(1, i) = py_p;
 		Xsig_pred_(2, i) = v_p;
-		Xsig_pred_(3, i) = yaw_p;
+		yaw_p  = tools.normalizeAngle(yaw_p);
+
+		Xsig_pred_(3, i)  = yaw_p;
 		Xsig_pred_(4, i) = yawd_p;
 	}
 }
@@ -348,7 +363,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
 	count_l_++;
 	double eps = tools.calcNIS(S_lidar_, meas_package.raw_measurements_, z_pred);
-	if(eps > 5.991)
+	if(eps > NIS_LIDAR_THRESHOLD)
 	  count_over_nis_l_++;
 
 
@@ -364,7 +379,6 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 	for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //2n+1 simga points
 		VectorXd vv = Xsig_pred_.col(i);
 		Zsig.col(i) = tools.CalculateBearingRangeFromXState(vv);
-
 	}
 
 	VectorXd z_pred = VectorXd(n_z_r_);
@@ -374,7 +388,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 
 	count_r_++;
 	double eps = tools.calcNIS(S_radar_, meas_package.raw_measurements_, z_pred);
-	if(eps > 7.815)
+	if(eps > NIS_RADAR_THRESHOLD)
 	  count_over_nis_r_++;
 
 }

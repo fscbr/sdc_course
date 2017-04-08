@@ -7,11 +7,11 @@
 #include "ukf.h"
 #include "ground_truth_package.h"
 #include "measurement_package.h"
+#include <string>
 
 using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-using std::vector;
 
 void check_arguments(int argc, char* argv[]) {
   string usage_instructions = "Usage instructions: ";
@@ -27,8 +27,10 @@ void check_arguments(int argc, char* argv[]) {
     cerr << "Please include an output file.\n" << usage_instructions << endl;
   } else if (argc == 3) {
     has_valid_args = true;
+  } else if (argc = 7) {
+	    has_valid_args = true;
   } else if (argc > 3) {
-    cerr << "Too many arguments.\n" << usage_instructions << endl;
+//    cerr << "Too many arguments.\n" << usage_instructions << endl;
   }
 
   if (!has_valid_args) {
@@ -63,15 +65,34 @@ int main(int argc, char* argv[]) {
 
   string line;
 
+  double std_a;
+  double std_yawdd;
+  double std_radr;
+  double std_radphi;
+  double std_radrd;
+
+  UKF *ukf;
+  if(argc == 8)
+  {
+	  std_a = atof(argv[3]);
+	  std_yawdd = atof(argv[4]);
+	  std_radr = atof(argv[5]);
+	  std_radphi = atof(argv[6]);
+	  std_radrd = atof(argv[7]);
+	  ukf = new UKF(std_a,std_yawdd,std_radr,std_radphi,std_radrd);
+  } else
+  {
+	  ukf = new UKF();
+  }
+
   // Create a UKF instance
-  UKF ukf;
   // used to compute the RMSE later
   vector<VectorXd> estimations;
   vector<VectorXd> ground_truth;
 
   // prep the measurement packages (each line represents a measurement at a
   // timestamp)
-  // ekf processing
+  // ukf processing
   // write to output file
   bool isFirstLine=true;
   double last_x=0;
@@ -132,12 +153,14 @@ int main(int argc, char* argv[]) {
     iss >> vx_gt;
     iss >> vy_gt;
 
+    //calculate measured x state for statistical comparisons
     float vx = x_meas - last_x;
     float vy = y_meas - last_y;
     float v = sqrt(vx*vx + vy*vy);
     float yaw = atan2(vy,vx);
     float dyaw = 0;
 
+    //calculate ground truth x state for statistical comparisons
     float v_gt = sqrt(vx_gt*vx_gt + vy_gt*vy_gt);
     float yaw_gt = atan2(vy_gt,vx_gt);
     float dyaw_gt = 0;
@@ -155,12 +178,18 @@ int main(int argc, char* argv[]) {
 	last_x = x_meas;
 	last_y = y_meas;
 
-    ukf.ProcessMeasurement(meas_package);
+    ukf->ProcessMeasurement(meas_package);
 
     //output stream to string as a buffer
     ostringstream out_line;
     // output the estimation
-    out_line << ukf.x_(0) << "\t" << ukf.x_(1) << "\t" << ukf.x_(2) << "\t" << ukf.x_(3) << "\t" << ukf.x_(4) << "\t";
+    float x_ukf = ukf->x_(0);
+    float y_ukf = ukf->x_(1);
+    float v_ukf = ukf->x_(2);
+    float yaw_ukf = ukf->x_(3);
+    float dyaw_ukf = ukf->x_(4);
+
+    out_line << x_ukf << "\t" << y_ukf << "\t" << v_ukf << "\t" << yaw_ukf << "\t" << dyaw_ukf << "\t";
 
     // output the measurements
     out_line << x_meas << "\t" << y_meas << "\t"; // x,y measured
@@ -174,19 +203,28 @@ int main(int argc, char* argv[]) {
     out_line.flush();
     out_file_ << out_line.str();
 
-    VectorXd gt_values = VectorXd(5);
-    gt_values << x_gt, y_gt, v_gt, yaw_gt, dyaw_gt;
+    VectorXd gt_values = VectorXd(4);
+    gt_values << x_gt, y_gt, vx_gt, vy_gt;
 
-    estimations.push_back(ukf.x_);
+    //calculate ukf vx and vy for RMSE calculation
+    float vx_ukf = v_ukf * cos(yaw_ukf);
+    float vy_ukf = v_ukf * sin(yaw_ukf);
+    VectorXd ukf_values = VectorXd(4);
+    ukf_values << x_ukf, y_ukf, vx_ukf, vy_ukf;
+
+    estimations.push_back(ukf_values);
     ground_truth.push_back(gt_values);
 
   }
-
-  cout << "radar NIS:" << ukf.GetNISRadarRatio() << endl;
-  cout << "lidar NIS:" << ukf.GetNISLidarRatio() << endl;
+  cout << "Parameter: std_a " << std_a << " std_yawdd " << std_yawdd << " std_radr "<< std_radr << " std_radphi "<< std_radphi << " std_radrd "<< std_radrd;
+  cout << " Radar NIS:" << ukf->GetNISRadarRatio();
+  cout << " Lidar NIS:" << ukf->GetNISLidarRatio();
  // compute the accuracy (RMSE)
   Tools tools;
-  cout << "Accuracy - RMSE:" << endl << tools.CalculateRMSE(estimations, ground_truth) << endl;
+  VectorXd rmse = tools.CalculateRMSE(estimations, ground_truth);
+  cout << " Accuracy - RMSE:" << rmse[0] << " " << rmse[1] << " " << rmse[2] << " " << rmse[3] << " Total " << rmse.sum() << endl;
+
+  delete ukf;
 
   // close files
   if (out_file_.is_open()) {

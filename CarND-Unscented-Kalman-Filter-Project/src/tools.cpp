@@ -9,8 +9,8 @@ Tools::~Tools() {
 
 VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 		const vector<VectorXd> &ground_truth) {
-	VectorXd rmse(5);
-	rmse << 0, 0, 0, 0, 0;
+	VectorXd rmse(4);
+	rmse << 0, 0, 0, 0;
 
 	// check the validity of the following inputs:
 	//  * the estimation vector size should not be zero
@@ -60,6 +60,8 @@ VectorXd Tools::CalculateBearingRangeFromXState(const VectorXd &x_state)
 	double vy = cos(yaw) * v;
 	double vx = sin(yaw) * v;
 	float z3 = (px*vy + py*vx)/z1;
+	if(std::isnan(z3))
+		printf("ups z3");
 
 	z << z1,z2,z3;
 
