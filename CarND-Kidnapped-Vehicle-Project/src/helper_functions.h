@@ -254,6 +254,21 @@ inline double gaussian(double mu, double sigma, double x)
     return exp(-pow(mu - x, 2) / pow(sigma, 2) / 2.0 ) / sqrt(2.0 * M_PI * pow(sigma, 2));
 }
 
+inline void convertObservations(std::vector<LandmarkObs>& observations, ground_truth gt)
+{
+
+  //convert observatuions. hier brauche ich die vecicle position
+  for(int i = 0; i < observations.size();i++)
+  {
+    double conv_x = observations[i].x * cos(gt.theta) + observations[i].y * sin(gt.theta) + gt.x;
+    double conv_y = (observations[i].x * sin(gt.theta) + observations[i].y * cos(gt.theta) + gt.y);
+
+    observations[i].x = conv_x;
+    observations[i].y = conv_y;
+  }
+}
+
+
 
 #endif /* HELPER_FUNCTIONS_H_ */
 

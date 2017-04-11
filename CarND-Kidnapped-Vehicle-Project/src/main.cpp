@@ -110,6 +110,9 @@ int main() {
 			noisy_observations.push_back(obs);
 		}
 
+		//to avoid conversion error I take the ground thruth for the vehicle pos
+		convertObservations(observations, gt[i]);
+
 		// Update the weights and resample
 		pf.updateWeights(sensor_range, sigma_landmark, noisy_observations, map);
 		pf.resample();
