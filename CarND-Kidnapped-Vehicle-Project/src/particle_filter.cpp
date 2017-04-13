@@ -12,9 +12,12 @@
 #include <random>
 #include <math.h>
 #include "particle_filter.h"
-
+#include "Eigen/Dense"
 
 using namespace std;
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
+using Eigen::VectorXi;
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// TODO: Set the number of particles. Initialize all particles to first position (based on estimates of 
@@ -60,7 +63,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
     for(int i=0; i<num_particles_; i++) {
 	    //Serial.println(particles_[i].theta);
 	    particles_[i].x += velocity_yaw_rate * (sin(particles_[i].theta + yaw_rate_dt) - sin(particles_[i].theta));
-	    particles_[i].x += velocity_yaw_rate * (cos(particles_[i].theta ) - cos(particles_[i].theta + yaw_rate_dt));
+	    particles_[i].y += velocity_yaw_rate * (cos(particles_[i].theta ) - cos(particles_[i].theta + yaw_rate_dt));
 	    particles_[i].theta += yaw_rate_dt;
 
 	    particles_[i].x += n_x_(gen_);
@@ -141,20 +144,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 	for(int i = 0; i < num_particles_;i++)
 	{
-	  Particle p = particles_[i];/*void ParticleFilter::move(double turn, double forward) {
-  for(int i=0; i<PART_COUNT; i++) {
-    //Serial.println(particles_[i].theta);
-    particles_[i].theta += turn + randn_trigobservations(0, Tnoise);
-    particles_[i].theta = circle(particles_[i].theta, 2.0 * PI);
-    //Serial.println(particles_[i].theta);
-    double dist = forward + randn_trig(0, Fnoise);
-
-    particles_[i].		Gaussian(mu, sigma, dist);
-    x += cos(particles_[i].theta) * dist;
-    particles_[i].y += sin(particles_[i].theta) * dist;
-  }
-
-}*/
+	  Particle p = particles_[i];
 
 	  double prob = 1.0;
 
@@ -186,20 +176,18 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 
-	std::cout << " weights:";
-	vector<int> vec;
-	double vecsum = 0.0;
-    for(int i=0; i<num_particles_; i++) {
-        vecsum += weights_[i]*1000;
-    	vec.push_back((int)weights_[i]*1000);
-        std::cout << weights_[i] << " ";
-    }
-    cout << std::endl;
+	VectorXd weights = VectorXd(num_particles_, weights_);
 
-    double factor = 1 / vecsum;
-    std::transform(vec.begin(), vec.end(), vec.begin(),std::bind1st(std::multiplies<double>(),factor));
+	std::cout << " weights:" << weights << endl;;
 
-	std::discrete_distribution<> dw(vec.begin() , vec.end() );
+	weights.normalize();
+	weights *= 1000;
+
+	std::cout << " weights:" << weights << endl;
+
+	VectorXi weightsI = weights.cast<int>();
+
+	std::discrete_distribution<> dw(weightsI.data(), weightsI.data()+weightsI.size());
 	std::vector<Particle> new_particles;
 
     for(int i=0; i<num_particles_; i++) {
