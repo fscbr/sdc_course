@@ -254,17 +254,30 @@ inline double gaussian(double mu, double sigma, double x)
     return exp(-pow(mu - x, 2) / pow(sigma, 2) / 2.0 ) / sqrt(2.0 * M_PI * pow(sigma, 2));
 }
 
+inline double gaussian2D(double mx, double my, double sigma_x, double sigma_y, double px,double py)
+{
+	double dxdx =  (mx - px)*(mx - px);
+	double dydy =  (my - py)*(my - py);
+    return exp(-0.5*((dxdx/sigma_x)+ (dydy/sigma_y)))/(2*M_PI*sqrt(sigma_x*sigma_y));
+}
+
 inline void convertObservations(std::vector<LandmarkObs>& observations, ground_truth gt)
 {
 
   //convert observatuions. hier brauche ich die vecicle position
+//  std::cout << "gt x:" << gt.x << " gt y:" << gt.y << " gt theta:" << gt.theta << std::endl;
   for(int i = 0; i < observations.size();i++)
   {
-    double conv_x = observations[i].x * cos(gt.theta) + observations[i].y * sin(gt.theta) + gt.x;
+    double conv_x = observations[i].x * cos(gt.theta) - observations[i].y * sin(gt.theta) + gt.x;
     double conv_y = (observations[i].x * sin(gt.theta) + observations[i].y * cos(gt.theta) + gt.y);
+
+//    std::cout << "x:" << observations[i].x << " y:" << observations[i].y;
 
     observations[i].x = conv_x;
     observations[i].y = conv_y;
+
+//    std::cout << " cx:" << conv_x << " cy:" << conv_y << std::endl;
+
   }
 }
 

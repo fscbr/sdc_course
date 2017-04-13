@@ -46,6 +46,7 @@ int main() {
 	normal_distribution<double> N_x_init(0, sigma_pos[0]);
 	normal_distribution<double> N_y_init(0, sigma_pos[1]);
 	normal_distribution<double> N_theta_init(0, sigma_pos[2]);
+
 	normal_distribution<double> N_obs_x(0, sigma_landmark[0]);
 	normal_distribution<double> N_obs_y(0, sigma_landmark[1]);
 	double n_x, n_y, n_theta, n_range, n_heading;
@@ -105,20 +106,20 @@ int main() {
 			n_x = N_obs_x(gen);
 			n_y = N_obs_y(gen);
 			obs = observations[j];
-			obs.x = obs.x + n_x;
-			obs.y = obs.y + n_y;
+//			obs.x = obs.x + n_x;
+//			obs.y = obs.y + n_y;
 			noisy_observations.push_back(obs);
 		}
 
 		//to avoid conversion error I take the ground thruth for the vehicle pos
-		convertObservations(observations, gt[i]);
+		convertObservations(noisy_observations, gt[i]);
 
 		// Update the weights and resample
 		pf.updateWeights(sensor_range, sigma_landmark, noisy_observations, map);
 		pf.resample();
 		
 		// Calculate and output the average weighted error of the particle filter over all time steps so far.
-		vector<Particle> particles = pf.particles;
+		vector<Particle> particles = pf.particles_;
 		int num_particles = particles.size();
 		double highest_weight = 0.0;
 		Particle best_particle;

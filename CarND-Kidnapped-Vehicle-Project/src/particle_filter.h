@@ -10,6 +10,7 @@
 #define PARTICLE_FILTER_H_
 
 #include "helper_functions.h"
+#include <random>
 
 struct Particle {
 
@@ -31,12 +32,18 @@ class ParticleFilter {
 	bool is_initialized_;
 	
 	// Vector of weights of all particles
-	std::vector<double> weights;
+	std::vector<double> weights_;
+
+	//gaussian random generator
+	std::default_random_engine gen_;
+	std::normal_distribution<double> n_x_;
+	std::normal_distribution<double> n_y_;
+	std::normal_distribution<double> n_theta_;
 
   public:
 	
 	// Set of current particles
-	std::vector<Particle> particles;
+	std::vector<Particle> particles_;
 
 	// Constructor
 	// @param M Number of particles
