@@ -33,7 +33,6 @@ A large Kp results in over-shooting. The car oscillates around the optimal path.
 " target="_blank"><img src="http://img.youtube.com/vi/OPx6l4ZHsf4/0.jpg" 
 alt="here at youtube" width="480" height="270" border="10" /></a>
 
-Your video will be live at: https://youtu.be/OPx6l4ZHsf4
 
 * Ki scales the integrated tracking error. The integration gives the accumulated offset that should have been corrected previously.
 Ki scales therefore the bias compensation. The video shows a large Ki.
