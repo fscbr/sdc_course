@@ -29,14 +29,29 @@ A large Kp results in over-shooting. The car oscillates around the optimal path.
 
 ![large Kp value][video2]
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=OPx6l4ZHsf4
+" target="_blank"><img src="http://img.youtube.com/vi/OPx6l4ZHsf4/0.jpg" 
+alt="here at youtube" width="480" height="270" border="10" /></a>
+
+Your video will be live at: https://youtu.be/OPx6l4ZHsf4
+
 * Ki scales the integrated tracking error. The integration gives the accumulated offset that should have been corrected previously.
 Ki scales therefore the bias compensation. The video shows a large Ki.
 
 ![large Ki value][video3]
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=4IPbuwjEkWY
+" target="_blank"><img src="http://img.youtube.com/vi/4IPbuwjEkWY/0.jpg" 
+alt="here at youtube" width="480" height="270" border="10" /></a>
+
 *Kd scales the derivative of the tracking error. The derivate of the tracking error is the rate of change and describes the dynamic behind the tracking error. The Kd parameter allows to damp oscilations of the car. A larger value reduces oscillation and inreases the time needed to compensate the tracking error. The video shows a large Kd.
 
 ![large Kd value][video4]
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=ZdmMWmH42Oo
+" target="_blank"><img src="http://img.youtube.com/vi/ZdmMWmH42Oo/0.jpg" 
+alt="here at youtube" width="480" height="270" border="10" /></a>
+
 
 ## How the final hyperparameters were chosen
 
@@ -63,6 +78,9 @@ The optimized parameters are:
 
 ![best solution][video1]
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=NW2TqJ_NRkQ
+" target="_blank"><img src="http://img.youtube.com/vi/NW2TqJ_NRkQ/0.jpg" 
+alt="here at youtube" width="480" height="270" border="10" /></a>
 
 
 
