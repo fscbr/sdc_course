@@ -21,6 +21,7 @@ Self-Driving Car Engineer Nanodegree Program
 2. Make a build directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
 4. Run it: `./pid`
+5. Choose Fastest to Simple Graphics quality for the simulator configuration 
 
 ## Effect each of the P, I, D components
 
@@ -43,13 +44,16 @@ Ki scales therefore the bias compensation. The video shows a large Ki.
 " target="_blank"><img src="http://img.youtube.com/vi/4IPbuwjEkWY/0.jpg" 
 alt="here at youtube" width="480" height="270" border="10" /></a>
 
-*Kd scales the derivative of the tracking error. The derivate of the tracking error is the rate of change and describes the dynamic behind the tracking error. The Kd parameter allows to damp oscilations of the car. A larger value reduces oscillation and inreases the time needed to compensate the tracking error. The video shows a large Kd.
+* Kd scales the derivative of the tracking error. The derivate of the tracking error is the rate of change and describes the dynamic behind the tracking error. The Kd parameter allows to damp oscilations of the car. A larger value reduces oscillation and inreases the time needed to compensate the tracking error. The video shows a large Kd.
 
 ![large Kd value][video4]
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=ZdmMWmH42Oo
 " target="_blank"><img src="http://img.youtube.com/vi/ZdmMWmH42Oo/0.jpg" 
 alt="here at youtube" width="480" height="270" border="10" /></a>
+
+
+* update rate of the simulator. My PID controller is optimized for the fastest upto simple graphics quality. Higher graphics modi result because of a slow frame rate in a lagged communication with the PID control. This leads to oscillation and might cause the car to get off the track.
 
 
 ## How the final hyperparameters were chosen
@@ -63,11 +67,11 @@ The result has been these parameters:
 |:-------:|:--------:|:--------:|
 | 0.08    | 0.00018  | 0.777    |
 
-In a second step, I used the twiggle parameter optimzation algorithm to improve the parameters.
+In a second step, I used the twiggle parameter optimization algorithm to improve the parameters.
 It started with an error of 0.842142.
 All 900 update requests the PID controller calls the twiggle optimizer to change the value of one parameter. 
 This covers about round of the parcour and ensures that the summarized tracking error is comparable in each optimization step.
-All 4500 update requests the optimization switches to the next parameter. the best error I gained is 0.235613.
+All 4500 update requests the optimization switches to the next parameter. The best error I gained is 0.235613.
 
 The optimized parameters are:
 
